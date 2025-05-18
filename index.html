@@ -1566,6 +1566,8 @@
       font-weight: 600;
     }
   </style>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
 </head>
 <body>
   <!-- SPLASH -->
@@ -5592,5 +5594,12 @@
     });
     // --- FIN NUEVAS FUNCIONES ---
   </script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(r => console.log("SW registrado:", r.scope))
+      .catch(console.error);
+  }
+</script>
 </body>
 </html>
