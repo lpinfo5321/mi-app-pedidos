@@ -1,29 +1,20 @@
 {
-  "id": "/",
   "name": "Mi App de Pedidos",
   "short_name": "Pedidos",
-  "description": "App web para la gestión de pedidos e inventario en La Primavera.",
-  "start_url": "/index.html",
-  "scope": "./",
+  "start_url": "/mi-app-pedidos/index.html",
+  "scope": "/mi-app-pedidos/",
   "display": "fullscreen",
-  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#000000",
+  "description": "App web para la gestión de pedidos e inventario en La Primavera.",
+  "id": "/mi-app-pedidos/",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
-  ],
-  "launch_handler": {
-    "client_mode": "auto"
-  }
+  ]
 }
