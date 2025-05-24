@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+  <link rel="manifest" href="manifest.json">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
@@ -34,13 +35,6 @@
     @keyframes fadeIn {
       0% { opacity: 0; }
       100% { opacity: 1; }
-    }
-
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateY(20px) translateX(-50%); }
-      20% { opacity: 1; transform: translateY(0) translateX(-50%); }
-      80% { opacity: 1; transform: translateY(0) translateX(-50%); }
-      100% { opacity: 0; transform: translateY(-20px) translateX(-50%); }
     }
 
     /* ====== SPLASH ====== */
@@ -168,6 +162,10 @@
     .tab:hover { opacity: 0.8; }
     .tab.active { border-bottom: 2px solid #000; }
 
+    /* BOTÓN SETTINGS - Ya no se usa posicionado absoluto, se integra en header-top-row */
+    /* .settings-button { ... } */
+    /* .settings-icon { ... } */
+
     /* BARRA DE BÚSQUEDA */
     .search-bar {
       display: flex;
@@ -231,6 +229,7 @@
       position: absolute;
       top: calc(100% + 8px); /* Debajo del botón activador + pequeño espacio */
       left: 0; /* Alineado a la izquierda del botón activador */
+      /* transform: translateX(-50%); Eliminado, ya no se centra respecto a un elemento central */
       background: #fff;
       border: 1px solid #ddd; /* Borde más sutil */
       border-radius: 12px; /* Esquinas más redondeadas */
@@ -280,10 +279,46 @@
       100% { opacity: 1; transform: scale(1); }
     }
 
+    /* BOTÓN VISTAS/ORDENAR - Ya no se usa posicionado absoluto, se integra en header-top-row */
+    /* .view-options-button { ... } */
+    /* .view-icon { ... } */
+
+    /* Explicitly style the active state to prevent default browser styles for generic buttons if needed */
+    /* .view-options-button:active { ... } */
+
+    .view-options {
+      display: none;
+      position: absolute;
+      top: 55px; /* Ajustar basado en la altura del nuevo header-icon-btn */
+      right: 10px; /* Ajustar para alinearse con el nuevo botón de la derecha */
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 8px;
+      gap: 6px;
+      flex-direction: column;
+      animation: viewOptionsAppear 0.2s ease-out; /* Updated animation */
+      z-index: 2000;
+      transform-origin: top right; /* Added transform-origin */
+    }
+    .view-option {
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: #000;
+    }
+    .view-option:hover { background: #f0f0f0; }
+
     /* CONTENIDO PRINCIPAL */
     .content {
       max-width: 1200px;
-      margin: 0 auto; /* margin-top se controlará con JS */
+      margin: 0 auto;
+      margin-top: 110px; /* Reducido, ya que el selector de compañía central se eliminó */
       padding: 10px 15px 80px;
     }
     /* Ocultar listas inicialmente y añadir transición */
@@ -306,7 +341,7 @@
     .grid-pc {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 6px; /* Reducido de 8px a 6px */
+      gap: 8px; /* Reducido de 12px a 8px */
       justify-items: center;
     }
 
@@ -317,7 +352,7 @@
     }
     .item {
       background: #fff;
-      padding: 10px; /* Reducido de 12px */
+      padding: 12px;
       border: 1px solid #ddd;
       border-radius: 8px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -343,7 +378,7 @@
       aspect-ratio: 1/1;
       background: #fff;
       border-radius: 8px;
-      margin-bottom: 6px; /* Reducido de 8px */
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -399,15 +434,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 4px; /* Reducido de 6px */
+      margin-bottom: 6px;
     }
     .product-name {
-      height: 2.6em; /* Aumentado de 2.4em para más espacio vertical */
+      height: 2.4em;
       line-height: 1.2;
       overflow: hidden;
       font-weight: 500;
       color: #111;
-      font-size: 0.9rem; /* Reducido de 0.95rem */
+      font-size: 0.95rem;
     }
     .product-number {
       font-size: 0.65rem;
@@ -420,7 +455,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px; /* Reducido de 4px */
+      gap: 4px;
       font-size: 0.85rem;
       width: 100%;
     }
@@ -472,7 +507,7 @@
       outline: none;
       transition: all 0.2s ease;
       font-size: 0.85rem;
-      margin: 0 2px; /* Reducido de 0 4px */
+      margin: 0 4px;
       font-weight: 500;
       display: flex;
       align-items: center;
@@ -677,8 +712,12 @@
 
       #priceContainer .price-row button { /* Botón "Eliminar" */
         align-self: auto; /* Alinear el botón de eliminar a la derecha */
+        /* padding: 12px 15px;  Ya no se usa este padding, se controla por width/height */
+        /* font-size: 0.85rem; No aplica directamente al icono */
+        /* Estilos de icono (width, height, padding=0) se heredan o se especifican en la regla base */
         width: 38px;
         height: 38px;
+        /* background y color se heredan de la regla base */
       }
       /* Estilo para el icono dentro del botón si es necesario ajustar específicamente para 480px */
       #priceContainer .price-row button .material-icons {
@@ -1319,160 +1358,217 @@
       }
     }
 
-    /* Estilos para el menú de opciones de vista */
-    .view-options {
-      position: absolute;
-      top: 48px;
-      right: 10px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      width: 200px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      padding: 10px 0;
-      z-index: 1500;
-      display: none;
-    }
-    
-    .view-options.show {
-      display: block !important;
-    }
-    
-    .view-options .view-option {
-      padding: 10px 15px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    
-    .view-options .view-option:hover {
-      background-color: #f5f5f5;
-    }
-    
-    .view-options hr {
-      margin: 10px 0;
-      border: none;
-      border-top: 1px solid #eee;
-    }
-
-    /* Estilos para el menú de colecciones */
-    .collections-menu {
-      position: absolute;
-      top: 48px;
-      right: 10px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      width: 280px;
-      max-height: 400px;
-      overflow-y: auto;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      display: none;
-      z-index: 2000;
-      padding: 10px 0;
-    }
-    
-    .collections-menu.show {
-      display: block;
-    }
-    
-    /* Estilos para los elementos dentro del menú de colecciones */
-    .collection-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 15px;
-      cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
-      transition: all 0.15s ease;
-    }
-    
-    .collection-item:last-child {
-      border-bottom: none;
-    }
-    
-    .collection-item:hover {
-      background: #f5f5f5;
-    }
-    
-    .collection-item.active {
-      background: #f0f0f0;
-      font-weight: 600;
-      box-shadow: inset 3px 0 0 #000;
-    }
-    
-    .collection-item-name {
-      flex-grow: 1;
-      margin-right: 10px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 0.95rem;
-    }
-    
-    .collection-actions {
-      display: flex;
-      gap: 5px;
-      opacity: 0.6;
-      transition: opacity 0.2s ease;
-    }
-    
-    .collection-item:hover .collection-actions {
-      opacity: 1;
-    }
-    
-    .collection-action-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 5px;
-      color: #555;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-    }
-    
-    .collection-action-btn:hover {
-      background: #e0e0e0;
-      color: #000;
-    }
-    
-    .new-collection-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 14px;
-      background: #f8f8f8;
-      border-top: 1px solid #eee;
-      cursor: pointer;
-      font-weight: 500;
-      color: #333;
-      transition: all 0.2s ease;
-    }
-    
-    .new-collection-btn:hover {
-      background: #e9e9e9;
-      color: #000;
-    }
-
     /* Media query para ajustar el modal de imagen en pantallas pequeñas */
     @media (max-width: 600px) {
       #imageZoomModal .modal-content {
-      justify-content: center;
-      gap: 8px;
-      padding: 14px;
-      background: #f8f8f8;
-      border-top: 1px solid #eee;
+        width: 90vw; /* Más ancho en móviles */
+        height: 75vh; /* Un poco menos alto en móviles */
+        max-height: 500px; /* Límite de altura más pequeño para móviles */
+      }
+    }
+
+    /* Estilos para el selector de tipo de margen */
+    .margin-type-selector {
+      display: flex;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #ccc; /* Borde alrededor del grupo */
+      margin-bottom: 8px;
+    }
+    .margin-type-option {
+      flex: 1; /* Distribución equitativa por defecto */
+    }
+    .margin-type-option input[type="radio"] {
+      display: none; /* Ocultar el radio button real */
+    }
+    .margin-type-option label {
+      display: block;
+      text-align: center;
+      padding: 8px 5px;
       cursor: pointer;
-      font-weight: 500;
+      background-color: #f0f0f0;
+      color: #333; /* Texto oscuro por defecto para no seleccionados */
+      font-size: 0.85rem;
+      font-weight: normal;
+      margin-bottom: 0;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .margin-type-option:first-child label {
+      border-right: 1px solid #ccc;
+    }
+    .margin-type-option input[type="radio"]:checked + label {
+      background-color: #333 !important; /* Fondo oscuro */
+      color: white !important; /* Texto blanco - con !important */
+      font-weight: bold !important;
+      border-color: #333 !important;
+    }
+    .margin-type-option label:hover {
+      background-color: #e0e0e0;
       color: #333;
-      transition: all 0.2s ease;
     }
-    .new-collection-btn:hover {
-      background: #e9e9e9;
-      color: #000;
+    .margin-type-option input[type="radio"]:checked + label:hover {
+      background-color: #000 !important;
+      color: white !important; /* Asegurar texto blanco también en hover del seleccionado */
     }
-  } /* ESTA ES LA LLAVE DE CIERRE FALTANTE PARA @media (max-width: 600px) */
+
+    /* CHIP MODERNO PARA INFO DE CONTADOR EN LA PARTE INFERIOR DERECHA DEL HEADER */
+    .info-chip-header-bottom {
+      /* Ya no se muestra de forma permanente, la información se integra en el modal del carrito */
+      display: none; 
+      /* position: absolute; 
+      right: 18px;
+      bottom: -35px; 
+      z-index: 1201;
+      display: flex;
+      align-items: flex-end;
+      pointer-events: none;
+      width: auto; */
+    }
+    .info-chip {
+      background: #fff;
+      color: #222;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      padding: 7px 18px;
+      min-width: 120px;
+      text-align: center;
+      display: inline-block;
+      border: 1px solid #eee;
+      letter-spacing: 0.01em;
+      pointer-events: auto;
+      transition: background 0.2s, color 0.2s;
+      user-select: none;
+    }
+    .info-chip:empty {
+      display: none;
+    }
+    @media (max-width: 600px) {
+      .info-chip-header-bottom {
+        right: 8px;
+        bottom: -30px; /* Ajuste para móviles */
+      }
+      .info-chip {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        min-width: 90px;
+      }
+    }
+
+    /* BOTÓN CARRITO/BADGE DENTRO DE LA BARRA DE BÚSQUEDA - Estilos eliminados/modificados */
+    /* .info-badge-btn-inside { ... } */
+    /* .info-badge-btn-inside:active { ... } */
+    /* .info-badge-btn-inside .material-icons { ... } */
+
+    .info-badge-count {
+      position: absolute;
+      top: -3px;  /* Ajuste para el nuevo botón */
+      right: -3px; /* Ajuste para el nuevo botón */
+      background: #e53935; /* Rojo más vibrante */
+      color: #fff;
+      font-size: 0.7rem; /* Un poco más pequeño */
+      font-weight: bold;
+      border-radius: 50%;
+      min-width: 16px; /* Tamaño mínimo */
+      height: 16px;  /* Tamaño mínimo */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px; /* Padding horizontal */
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      border: 1.5px solid #fff; /* Borde blanco */
+      z-index: 3;
+      pointer-events: none;
+    }
+    /* .search-bar { */ /* position: relative; ya está arriba */
+    /* } */
+    /* Ya no se necesita padding extra en el input de búsqueda para el botón interno */
+    /* .search-bar input { ... } */ 
+
+    @media (max-width: 600px) {
+      /* .info-badge-btn-inside { ... } */ /* Eliminado */
+      .info-badge-count {
+        font-size: 0.65rem;
+        min-width: 14px;
+        height: 14px;
+        top: -2px;
+        right: -2px;
+      }
+      /* .search-bar input { ... } */ /* Eliminado */
+      .header-icon-btn {
+        width: 38px; /* Ligeramente más pequeño en móviles */
+        height: 38px;
+      }
+      .header-icon-btn .material-icons {
+        font-size: 20px;
+      }
+      .search-bar {
+        padding: 5px 10px; /* Ajuste para móviles */
+      }
+      .search-bar .material-icons { font-size: 18px; margin-right: 6px;}
+      .search-bar input { font-size: 0.85rem; }
+
+       .header-top-row {
+        gap: 0.3rem;
+        padding: 0.1rem 0;
+        margin-bottom: 0.4rem;
+      }
+      .header-icon-group-left,
+      .header-icon-group-right {
+        gap: 0.3rem;
+      }
+      /* .company-selector img { ... } */ /* Eliminado ya que el selector central no existe */
+      .tabs .tab { /* Reducir un poco las tabs en móviles */
+        padding: 6px 8px;
+        font-size: 0.9rem;
+      }
+       .content {
+        margin-top: 130px; /* Reducir margen superior en móviles */
+        margin-top: 100px; /* Ajuste adicional para móviles después de quitar el selector central */
+      }
+    }
+
+    /* MODAL INFO BADGE */
+    .info-badge-modal-content {
+      max-width: 320px;
+      min-width: 220px;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      padding: 28px 18px 22px 18px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+    }
+    .info-badge-modal-header {
+      display: flex;
+      justify-content: center; /* Cambiado para centrar el icono del carrito */
+      align-items: center;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    #infoBadgeModalIcon {
+      font-size: 2rem;
+      color: #222;
+    }
+    .info-badge-modal-close-btn {
+      background: none;
+      border: none;
+      color: #222;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0;
+    }
+    .info-badge-modal-text-content {
+      margin: 18px 0 0 0;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #222;
+      font-weight: 600;
+    }
   </style>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
 </head>
 <body>
   <!-- SPLASH -->
@@ -1487,9 +1583,9 @@
       <!-- Nueva Fila Superior -->
       <div class="header-top-row">
         <div class="header-icon-group-left">
-          <button class="header-icon-btn" onclick="openSettingsTab()" title="Ajustes">
+          <button class="header-icon-btn" onclick="openSettingsTab()" title="Menú">
             <span class="material-icons">settings</span> <!-- Cambiado de menu a settings -->
-      </button>
+          </button>
           <button class="header-icon-btn store-icon-btn" title="Seleccionar Compañía" onclick="toggleCompanyPopup(event)">
             <span id="storeButtonIconContainer">
               <span class="material-icons">storefront</span>
@@ -1497,27 +1593,23 @@
           </button>
         </div>
 
-      <div class="search-bar">
-        <span class="material-icons">search</span>
-        <input type="text" id="searchInput" placeholder="Buscar producto..." oninput="updateSearch(this.value)" />
-        <button class="clear-search-btn" onclick="clearSearch()" title="Limpiar búsqueda">
+        <div class="search-bar">
+          <span class="material-icons">search</span>
+          <input type="text" id="searchInput" placeholder="Buscar producto..." oninput="updateSearch(this.value)" />
+          <button class="clear-search-btn" onclick="clearSearch()" title="Limpiar búsqueda">
             <span class="material-icons">close</span>
-        </button>
+          </button>
         </div>
 
         <div class="header-icon-group-right">
-          <button class="header-icon-btn cart-icon-btn collections-menu-btn" onclick="toggleCollectionsMenu(event)" title="Seleccionar Colección">
-            <span id="currentCollectionLogo"></span>
-          </button>
-          <div id="collectionsMenu" class="collections-menu"></div>
           <button class="header-icon-btn cart-icon-btn" id="infoBadgeBtn" onclick="openInfoBadgeModal(event)" type="button" title="Carrito">
-          <span id="infoBadgeIcon" class="material-icons">shopping_cart</span>
-          <span id="infoBadgeCount" class="info-badge-count">0</span>
-        </button>
-          <button class="header-icon-btn" onclick="toggleViewOptions()" title="Filtrar">
+            <span id="infoBadgeIcon" class="material-icons">shopping_cart</span>
+            <span id="infoBadgeCount" class="info-badge-count">0</span>
+          </button>
+          <button class="header-icon-btn" onclick="toggleViewOptions()" title="Opciones de Vista">
             <span class="material-icons">filter_list</span> <!-- Cambiado de settings a filter_list -->
-        </button>
-      </div>
+          </button>
+        </div>
       </div>
 
       <!-- El div.company-selector original se elimina. El popup se asocia al botón de tienda. -->
@@ -1919,52 +2011,6 @@
 
   <script>
     /* ===== FUNCIONES BÁSICAS ===== */
-
-    // Función para parsear cantidades (puede manejar fracciones como "1/2" y decimales)
-    function parseQuantity(value) {
-      if (typeof value === 'number') {
-        return value;
-      }
-      if (typeof value === 'string') {
-        if (value.includes('/')) {
-          const parts = value.split('/');
-          if (parts.length === 2) {
-            const num = parseFloat(parts[0]);
-            const den = parseFloat(parts[1]);
-            if (!isNaN(num) && !isNaN(den) && den !== 0) {
-              return num / den;
-            }
-          }
-        } else {
-          const num = parseFloat(value);
-          if (!isNaN(num)) {
-            return num;
-          }
-        }
-      }
-      return 0; // Retornar 0 si no se puede parsear
-    }
-
-    // Función para formatear cantidades para visualización
-    function formatQuantity(value) {
-      if (typeof value !== 'number') {
-        value = parseFloat(value) || 0;
-      }
-      // Si es un número entero, devolver como string
-      if (Number.isInteger(value)) {
-        return String(value);
-      }
-      // Si es .5, convertir a fracción X/2
-      if (value % 1 === 0.5) {
-        if (value === 0.5) return '1/2';
-        const integerPart = Math.floor(value);
-        if (integerPart === 0) return '1/2'; // Para 0.5 específicamente
-        return `${integerPart * 2 + 1}/2`; // Ej: 1.5 -> 3/2, 2.5 -> 5/2
-      }
-      // Para otros decimales, redondear a 2 decimales (o ajustar según necesidad)
-      return value.toFixed(2).replace(/\.?0+$/, ""); // Eliminar ceros innecesarios al final
-    }
-
     // Deshabilitar la restauración de scroll automática del navegador
     if (history.scrollRestoration) {
       history.scrollRestoration = 'manual';
@@ -1976,77 +2022,32 @@
     const CATEGORIES_KEY = "allCategories_v2";
     const COMPANIES_KEY = "allCompanies_v2";
     const ORDER_SYSTEM_MIGRATED_KEY = "orderSystemMigrated_v1"; // Nueva clave para la migración
-    const COLLECTIONS_KEY = "productCollections"; // Nueva clave para las colecciones
-    
-    // Variables globales
-    let allItems = {};
-    let searchTerm = '';
-    let currentCompanyFilter = '';
-    let currentColumns = localStorage.getItem('currentColumns') || 'pc';
-    let currentSortMode = localStorage.getItem('currentSortMode') || 'byNameAsc';
-    let currentCollection = localStorage.getItem('currentCollection') || 'default'; // Colección actual
-    let sortMode = currentSortMode; // Para mantener compatibilidad con código existente
-    let currentEdit = null;
-    let lastScrollPosition = 0;
-    let currentOrderPDFFile = null; // Para almacenar el PDF generado para compartir
+
+    // Función para escapar caracteres especiales
+    function escapeHtml(text) {
+      if (typeof text !== 'string') return '';
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
     // Inicialización
     function initApp() {
-      try {
-        console.log("Iniciando aplicación...");
-        
-        // Mostrar indicador de carga
-        showLoadingIndicator();
-        
-        // Verificar si hay datos de recuperación de emergencia, pero no mostrar el mensaje automáticamente
-        // Solo se cargará desde el botón de recuperación cuando sea necesario
-        const emergencyData = localStorage.getItem('emergency_backup');
-        // Dejamos el código comentado para referencia, pero no lo ejecutamos para evitar el mensaje constante
-        /*
-        if (emergencyData) {
-          console.log("Datos de recuperación de emergencia encontrados, pero no se mostrarán automáticamente");
-        }
-        */
-        
-        // Si hay un error grave en la carga de datos, se mostrará el botón de recuperación más adelante
-        
-        // Migrar datos antiguos si es necesario
-        const isOrderSystemMigrated = localStorage.getItem(ORDER_SYSTEM_MIGRATED_KEY);
-        if (!isOrderSystemMigrated) {
-          migrateOrderSystem();
-        }
-        
-        // Inicializar sistema de colecciones si es necesario
-        initCollectionsSystem();
-        
-        // Comprobar si hay datos en allItems
-        if (!allItems || Object.keys(allItems).length === 0) {
-          console.log("Variable allItems vacía, intentando cargar datos...");
-          
-          // Restaurar la colección actual
-          currentCollection = localStorage.getItem('currentCollection') || 'default';
-          
-          // Cargar datos de la colección actual
-          const collection = getCurrentCollection();
-          if (collection && collection.items) {
-            try {
-              console.log("Cargando desde colección actual:", currentCollection);
-              allItems = JSON.parse(collection.items);
-              console.log("Datos cargados:", Object.keys(allItems).length, "elementos");
-              
-              // Solo crear copia de seguridad de emergencia si hay productos
-              if (Object.keys(allItems).length > 0) {
-                // Usar una clave temporal que se borrará después de cada sesión
-                sessionStorage.setItem('temp_backup', collection.items);
-                console.log("Copia de seguridad temporal creada:", Object.keys(allItems).length, "elementos");
-              }
-            } catch (e) {
-              console.error("Error al cargar los datos de la colección:", e);
-              allItems = {};
-            }
-          } else {
-            console.warn("No se encontró una colección válida");
-          }
+      // Inicializar listas si no existen
+      if (!localStorage.getItem(UNITS_KEY)) {
+        localStorage.setItem(UNITS_KEY, JSON.stringify(["pz", "kg", "lt"]));
+      }
+      if (!localStorage.getItem(PRESENTATIONS_KEY)) {
+        localStorage.setItem(PRESENTATIONS_KEY, JSON.stringify(["caja", "paquete", "costal", "pieza"]));
+      }
+      if (!localStorage.getItem(CATEGORIES_KEY)) {
+        localStorage.setItem(CATEGORIES_KEY, JSON.stringify(["General", "Alimentos", "Limpieza"]));
+      }
+      if (!localStorage.getItem(COMPANIES_KEY)) {
+        localStorage.setItem(COMPANIES_KEY, JSON.stringify([]));
       }
 
       // Restaurar filtros guardados
@@ -2056,1060 +2057,71 @@
       migrateOrderSystem();
       // *** Fin Nueva Migración ***
 
-        // Verificar si hay elementos cargados
-        console.log("Inventario actual:", Object.keys(allItems).length, "elementos");
-        
-        // Cargar inventario en la UI
+      // Cargar inventario
       renderTabs(); // Renderiza el contenido, pero las listas están opacity 0 debido a showTab y CSS
       updateDeleteButtons();
-        
-        // Actualizar visualización de la compañía y colección actual
-        updateCurrentCompanyLogo(); 
-        updateCurrentCollectionDisplay();
       
       // Restaurar posición de desplazamiento después de renderizar
-        setTimeout(function() {
-          const scrollPos = localStorage.getItem('scrollPos') || 0;
-          window.scrollTo(0, scrollPos);
-          
-          // Ocultar indicador de carga
-          hideLoadingIndicator();
-          
-          // Mostrar notificación de bienvenida con el nombre de la colección
-          const collection = getCurrentCollection();
-          if (collection) {
-            showNotification(`Colección "${collection.name}" cargada correctamente`);
-          }
-          
-          // Verificar si se ha podido cargar el inventario
-          if (!allItems || Object.keys(allItems).length === 0) {
-            // Mostrar botón especial para ayudar a recuperar datos
-            showRecoveryButton();
-          }
-          adjustContentMargin(); // <--- LLAMAR A LA FUNCIÓN AQUÍ
-        }, 300);
-        
-        // Cargar el contenido de la pestaña activa por defecto (Pedido)
-        showTab('pedido');
-      } catch (error) {
-        console.error("Error durante la inicialización:", error);
-        hideLoadingIndicator();
-        alert("Hubo un problema al iniciar la aplicación. Por favor, recarga la página.");
-        
-        // Mostrar botón de recuperación
-        showRecoveryButton();
-      }
-    }
-    
-    // Función para mostrar un botón de recuperación de datos
-    function showRecoveryButton() {
-      // Si ya existe, no crear otro
-      if (document.getElementById('recovery-button')) return;
-      
-      // Crear el botón
-      const button = document.createElement('button');
-      button.id = 'recovery-button';
-      button.innerHTML = '🔄 Recuperar datos';
-      button.style.position = 'fixed';
-      button.style.top = '10px';
-      button.style.right = '10px';
-      button.style.zIndex = '9999';
-      button.style.backgroundColor = '#ff3b30';
-      button.style.color = 'white';
-      button.style.border = 'none';
-      button.style.borderRadius = '8px';
-      button.style.padding = '8px 15px';
-      button.style.fontWeight = 'bold';
-      button.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-      button.style.cursor = 'pointer';
-      
-      // Añadir evento de clic
-      button.onclick = function() {
-        // Método de recuperación 0: Usar datos de emergencia si existen
-        const emergencyData = localStorage.getItem('emergency_backup');
-        if (emergencyData && emergencyData !== '{}' && emergencyData !== 'null') {
-          try {
-            const parsed = JSON.parse(emergencyData);
-            if (Object.keys(parsed).length > 0) {
-              const confirmEmergency = confirm(`Se encontraron ${Object.keys(parsed).length} elementos en la copia de seguridad de emergencia. ¿Deseas restaurarlos?`);
-              
-              if (confirmEmergency) {
-                allItems = parsed;
-                
-                // Guardar en colección actual
-                currentCollection = localStorage.getItem('currentCollection') || 'default';
-                const collections = getCollections();
-                
-                if (collections[currentCollection]) {
-                  collections[currentCollection].items = emergencyData;
-                  collections[currentCollection].lastModified = new Date().toISOString();
-                  collections[currentCollection].recoveredFromEmergency = true;
-                  saveCollections(collections);
-                  
-                  // Limpiar la copia de emergencia para evitar solicitudes futuras
-                  localStorage.removeItem('emergency_backup');
-                  
-                  // Actualizar UI
-                  renderTabs();
-                  
-                  alert('Datos restaurados correctamente desde la copia de emergencia');
-                  button.style.display = 'none';
-                  return;
-                }
-              }
-            }
-          } catch (e) {
-            console.error("Error al restaurar datos de emergencia:", e);
-          }
-        }
-        
-        // Método de recuperación 1: Importar desde el almacenamiento local antiguo
-        const oldInventory = localStorage.getItem('inventory_v2_moderno');
-        if (oldInventory && oldInventory !== '{}' && oldInventory !== 'null') {
-          try {
-            const parsed = JSON.parse(oldInventory);
-            if (Object.keys(parsed).length > 0) {
-              const confirm1 = confirm(`Se encontraron ${Object.keys(parsed).length} elementos en el almacenamiento antiguo. ¿Deseas recuperarlos?`);
-              
-              if (confirm1) {
-                allItems = parsed;
-                
-                // Guardar en la colección actual
-                saveCurrentItemsToCollection(parsed);
-                
-                // Actualizar UI
-                renderTabs();
-                
-                alert('Datos recuperados correctamente');
-                button.style.display = 'none';
-                return;
-              }
-            }
-          } catch (e) {
-            console.error("Error al recuperar desde almacenamiento antiguo:", e);
-          }
-        }
-        
-        // Método de recuperación 2: Crear una nueva colección
-        const confirm2 = confirm("¿Deseas crear una nueva colección vacía? Esto puede ayudar si la colección actual está dañada.");
-        
-        if (confirm2) {
-          createNewCollection();
-          button.style.display = 'none';
-        }
-      };
-      
-      // Añadir al documento
-      document.body.appendChild(button);
-    }
+      restoreScrollPosition(); // Esto tiene un setTimeout interno de 100ms para aplicar el scroll
 
-    // Inicialización del sistema de colecciones
-    function initCollectionsSystem() {
-      // Comprobar si ya existe estructura de colecciones
-      let collections = localStorage.getItem(COLLECTIONS_KEY);
-      
-      if (!collections) {
-        try {
-          console.log("Creando estructura de colecciones inicial...");
-          
-          // Intentar migrar datos existentes de varias fuentes posibles
-          let initialData = '{}';
-          
-          // Intentar cargar desde 'allItems' (formato antiguo)
-          const allItemsOld = localStorage.getItem('allItems');
-          if (allItemsOld && allItemsOld !== '{}' && allItemsOld !== 'null') {
-            console.log("Usando datos de 'allItems'");
-            initialData = allItemsOld;
-          } 
-          // Si no hay datos en 'allItems', intentar con 'inventory_v2_moderno'
-          else {
-            const inventoryData = localStorage.getItem('inventory_v2_moderno');
-            if (inventoryData && inventoryData !== '{}' && inventoryData !== 'null') {
-              console.log("Usando datos de 'inventory_v2_moderno'");
-              initialData = inventoryData;
-            }
-          }
-          
-          // Crear colección por defecto con los datos obtenidos
-          const defaultCollection = {
-            name: 'Principal',
-            items: initialData,
-            created: new Date().toISOString(),
-            lastModified: new Date().toISOString()
-          };
-          
-          const collectionsObj = {
-            default: defaultCollection
-          };
-          
-          // Guardar la estructura de colecciones y establecer 'default' como actual
-          localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collectionsObj));
-          localStorage.setItem('currentCollection', 'default');
-          
-          // Cargar explícitamente los datos de la colección predeterminada en allItems
-          try {
-            allItems = JSON.parse(initialData);
-            console.log("Datos cargados en allItems", Object.keys(allItems).length, "elementos");
-          } catch (e) {
-            console.error("Error al parsear datos iniciales:", e);
-            allItems = {};
-          }
-        } catch (e) {
-          console.error("Error al inicializar sistema de colecciones:", e);
-          // Crear una colección vacía como fallback
-          const emptyCollection = {
-            default: {
-              name: 'Principal',
-              items: '{}',
-              created: new Date().toISOString(),
-              lastModified: new Date().toISOString()
-            }
-          };
-          localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(emptyCollection));
-          localStorage.setItem('currentCollection', 'default');
-          allItems = {};
-        }
-      } else {
-        // Cargar la colección actual
-        const currentId = localStorage.getItem('currentCollection') || 'default';
-        try {
-          const parsed = JSON.parse(collections);
-          if (parsed[currentId] && parsed[currentId].items) {
-            allItems = JSON.parse(parsed[currentId].items);
-            console.log("Cargada colección existente:", currentId, "con", Object.keys(allItems).length, "elementos");
-          }
-        } catch (e) {
-          console.error("Error al cargar colección existente:", e);
-        }
-      }
-      
-      // Construir el menú de colecciones
-      buildCollectionsMenu();
-    }
-
-    // Construir el menú desplegable de colecciones
-    function buildCollectionsMenu() {
-      const menu = document.getElementById('collectionsMenu');
-      if (!menu) {
-        console.error('Error: No se encontró el menú de colecciones');
-        return;
-      }
-      
-      menu.innerHTML = '';
-      console.log('Construyendo menú de colecciones...');
-      
-      // Añadir el nombre de la colección actual al inicio del menú
-      const currentCollection = getCurrentCollection();
-      if (currentCollection) {
-        const currentCollectionHeader = document.createElement('div');
-        currentCollectionHeader.className = 'current-collection-header';
-        currentCollectionHeader.style.padding = '12px 15px';
-        currentCollectionHeader.style.borderBottom = '1px solid #eee';
-        currentCollectionHeader.style.fontWeight = 'bold';
-        currentCollectionHeader.style.display = 'flex';
-        currentCollectionHeader.style.alignItems = 'center';
-        currentCollectionHeader.style.gap = '8px';
-        
-        // Añadir logo si existe
-        if (currentCollection.logoUrl) {
-          const logoImg = document.createElement('img');
-          logoImg.src = currentCollection.logoUrl;
-          logoImg.alt = currentCollection.name;
-          logoImg.style.width = '24px';
-          logoImg.style.height = '24px';
-          logoImg.style.borderRadius = '4px';
-          logoImg.style.objectFit = 'contain';
-          currentCollectionHeader.appendChild(logoImg);
-        }
-        
-        const nameText = document.createTextNode(currentCollection.name);
-        currentCollectionHeader.appendChild(nameText);
-        
-        menu.appendChild(currentCollectionHeader);
-      }
-      
-      const collections = getCollections();
-      const currentCollectionId = localStorage.getItem('currentCollection') || 'default';
-      
-      // Añadir cada colección al menú
-      Object.entries(collections).forEach(([id, collection]) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'collection-item';
-        if (id === currentCollectionId) {
-          itemDiv.classList.add('active');
-        }
-        
-        // Contenedor para logo y nombre
-        const infoContainer = document.createElement('div');
-        infoContainer.className = 'collection-info';
-        infoContainer.style.display = 'flex';
-        infoContainer.style.alignItems = 'center';
-        infoContainer.style.gap = '8px';
-        infoContainer.style.cursor = 'pointer';
-        infoContainer.onclick = (e) => {
-          e.stopPropagation();
-          selectCollection(id);
-        };
-        
-        // Logo de la colección (si existe)
-        if (collection.logoUrl) {
-          const logoImg = document.createElement('img');
-          logoImg.src = collection.logoUrl;
-          logoImg.alt = collection.name;
-          logoImg.style.width = '24px';
-          logoImg.style.height = '24px';
-          logoImg.style.borderRadius = '4px';
-          logoImg.style.objectFit = 'contain';
-          infoContainer.appendChild(logoImg);
-        }
-        
-        // Nombre de la colección
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'collection-item-name';
-        nameSpan.textContent = collection.name;
-        
-        infoContainer.appendChild(nameSpan);
-        
-        // Acciones (renombrar, duplicar, eliminar)
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'collection-actions';
-        
-        // Botón renombrar
-        const renameBtn = document.createElement('button');
-        renameBtn.className = 'collection-action-btn';
-        renameBtn.innerHTML = '<span class="material-icons" style="font-size:18px;">edit</span>';
-        renameBtn.title = 'Editar';
-        renameBtn.onclick = (e) => {
-          e.stopPropagation();
-          renameCollection(id);
-        };
-        
-        // Botón duplicar
-        const duplicateBtn = document.createElement('button');
-        duplicateBtn.className = 'collection-action-btn';
-        duplicateBtn.innerHTML = '<span class="material-icons" style="font-size:18px;">content_copy</span>';
-        duplicateBtn.title = 'Duplicar';
-        duplicateBtn.onclick = (e) => {
-          e.stopPropagation();
-          duplicateCollection(id);
-        };
-        
-        // Botón eliminar (solo si hay más de una colección)
-        if (Object.keys(collections).length > 1) {
-          const deleteBtn = document.createElement('button');
-          deleteBtn.className = 'collection-action-btn';
-          deleteBtn.innerHTML = '<span class="material-icons" style="font-size:18px;">delete</span>';
-          deleteBtn.title = 'Eliminar';
-          deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            deleteCollection(id);
-          };
-          actionsDiv.appendChild(deleteBtn);
-        }
-        
-        // Añadir botones a div de acciones
-        actionsDiv.appendChild(renameBtn);
-        actionsDiv.appendChild(duplicateBtn);
-        
-        // Añadir elementos al item
-        itemDiv.appendChild(infoContainer);
-        itemDiv.appendChild(actionsDiv);
-        
-        // Añadir item al menú
-        menu.appendChild(itemDiv);
-      });
-      
-      // Añadir botón Nueva Colección
-      const newCollectionBtn = document.createElement('div');
-      newCollectionBtn.className = 'new-collection-btn';
-      newCollectionBtn.innerHTML = '<span class="material-icons" style="font-size:18px;">add</span> Nueva Colección';
-      newCollectionBtn.onclick = (e) => {
-        e.stopPropagation();
-        createNewCollection();
-      };
-      
-      menu.appendChild(newCollectionBtn);
-    }
-
-    // Mostrar/ocultar menú de colecciones
-    function toggleCollectionsMenu(event) {
-      if (event) {
-        event.stopPropagation();
-      }
-      
-      const menu = document.getElementById('collectionsMenu');
-      if (!menu) {
-        console.error('Error: No se encontró el elemento collectionsMenu');
-        return;
-      }
-      
-      menu.classList.toggle('show');
-      
-      // Registrar el estado para debugging
-      console.log('Estado del menú de colecciones:', menu.classList.contains('show') ? 'visible' : 'oculto');
-      
-      if (menu.classList.contains('show')) {
-        try {
-          buildCollectionsMenu();
-          
-          // Agregar event listener para cerrar el menú al hacer clic en cualquier otro lugar
-          document.addEventListener('click', closeCollectionsMenuOutside);
-        } catch (e) {
-          console.error('Error al construir el menú de colecciones:', e);
-        }
-      } else {
-        // Quitar el event listener cuando se cierra el menú
-        document.removeEventListener('click', closeCollectionsMenuOutside);
-      }
-    }
-    
-    // Función para cerrar el menú al hacer clic fuera de él
-    function closeCollectionsMenuOutside(event) {
-      const menu = document.getElementById('collectionsMenu');
-      const button = document.querySelector('.collections-menu-btn');
-      
-      // Si se hace clic fuera del menú y fuera del botón, cerrar el menú
-      if (menu && !menu.contains(event.target) && !button.contains(event.target)) {
-        menu.classList.remove('show');
-        document.removeEventListener('click', closeCollectionsMenuOutside);
-        console.log('Menú de colecciones cerrado por clic externo');
-      }
-    }
-
-    // Obtener todas las colecciones
-    function getCollections() {
-      const collectionsStr = localStorage.getItem(COLLECTIONS_KEY);
-      return collectionsStr ? JSON.parse(collectionsStr) : {};
-    }
-
-    // Obtener la colección actual
-    function getCurrentCollection() {
-      const collectionId = localStorage.getItem('currentCollection') || 'default';
-      const collections = getCollections();
-      return collections[collectionId] || null;
-    }
-
-    // Guardar colecciones en localStorage
-    function saveCollections(collections) {
-      localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections));
-    }
-
-    // Seleccionar una colección
-    function selectCollection(id) {
-      const collections = getCollections();
-      if (!collections[id]) return;
-      
-      try {
-        // Mostrar un indicador de carga
-        showLoadingIndicator();
-        
-        // Guardar los datos actuales en la colección actual antes de cambiar
-        saveCurrentItemsToCollection();
-        
-        // Cambiar a la nueva colección
-        localStorage.setItem('currentCollection', id);
-        
-        // Cargar datos de la nueva colección
-        const newCollectionData = collections[id].items || '{}';
-        allItems = JSON.parse(newCollectionData);
-        
-        // Actualizar la interfaz de usuario
-        toggleCollectionsMenu();
-        updateCurrentCollectionDisplay();
-        
-        // Cambiar a la pestaña "Pedido" por defecto para mantener la coherencia
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('.tab:first-child').classList.add('active');
-        
-        // Renderizar las pestañas con la nueva colección
-        renderTabs();
-        
-        // Actualizar contadores y badges
-        updateInfoBadge();
-        
-        // Notificar el cambio
-        showNotification(`Colección "${collections[id].name}" cargada correctamente`);
-      } catch (error) {
-        console.error("Error al cambiar de colección:", error); // IMPRIMIR EL ERROR ESPECÍFICO
-        alert("Hubo un problema al cargar la colección. Por favor, intente nuevamente.");
-      } finally {
-        // Ocultar el indicador de carga
-        hideLoadingIndicator();
-      }
-    }
-    
-    // Función para mostrar notificación temporal
-    function showNotification(message, duration = 2000) {
-      // Eliminar notificación anterior si existe
-      const existingNotification = document.getElementById('temp-notification');
-      if (existingNotification) {
-        document.body.removeChild(existingNotification);
-      }
-      
-      // Crear nueva notificación
-      const notification = document.createElement('div');
-      notification.id = 'temp-notification';
-      notification.style.position = 'fixed';
-      notification.style.bottom = '20px';
-      notification.style.left = '50%';
-      notification.style.transform = 'translateX(-50%)';
-      notification.style.backgroundColor = 'rgba(0,0,0,0.8)';
-      notification.style.color = 'white';
-      notification.style.padding = '10px 20px';
-      notification.style.borderRadius = '20px';
-      notification.style.zIndex = '9999';
-      notification.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-      notification.style.animation = 'fadeInOut 2s ease-in-out';
-      notification.textContent = message;
-      
-      // Añadir a la página
-      document.body.appendChild(notification);
-      
-      // Eliminar después de la duración
+      // Hacemos visible el contenido de la lista activa DESPUÉS de que restoreScrollPosition haya actuado.
       setTimeout(() => {
-        if (notification.parentNode) {
-          document.body.removeChild(notification);
+        const activeTabName = localStorage.getItem('activeTab') || 'pedido';
+        const activeListElement = document.getElementById(activeTabName + 'List');
+        if (activeListElement) {
+          activeListElement.style.opacity = '1';
         }
-      }, duration);
+      }, 150); // Esperar 150ms para dar tiempo a que el scroll (100ms) se aplique.
     }
     
-    // Indicador de carga
-    function showLoadingIndicator() {
-      const loader = document.createElement('div');
-      loader.id = 'app-loader';
-      loader.style.position = 'fixed';
-      loader.style.top = '0';
-      loader.style.left = '0';
-      loader.style.width = '100%';
-      loader.style.height = '100%';
-      loader.style.backgroundColor = 'rgba(255,255,255,0.7)';
-      loader.style.display = 'flex';
-      loader.style.justifyContent = 'center';
-      loader.style.alignItems = 'center';
-      loader.style.zIndex = '9999';
+    // Guardar y restaurar estado
+    function saveFiltersAndState() {
+      localStorage.setItem('sortMode', sortMode);
+      localStorage.setItem('currentColumns', currentColumns);
+      localStorage.setItem('currentCompanyFilter', currentCompanyFilter || '');
+      localStorage.setItem('searchTerm', searchTerm || '');
       
-      const spinnerContainer = document.createElement('div');
-      spinnerContainer.style.width = '80px';
-      spinnerContainer.style.height = '80px';
-      spinnerContainer.style.borderRadius = '50%';
-      spinnerContainer.style.background = 'white';
-      spinnerContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-      spinnerContainer.style.display = 'flex';
-      spinnerContainer.style.justifyContent = 'center';
-      spinnerContainer.style.alignItems = 'center';
-      
-      const spinner = document.createElement('div');
-      spinner.style.width = '40px';
-      spinner.style.height = '40px';
-      spinner.style.border = '3px solid #f3f3f3';
-      spinner.style.borderTop = '3px solid #000';
-      spinner.style.borderRadius = '50%';
-      spinner.style.animation = 'spin 1s linear infinite';
-      
-      // Añadir la regla de animación si no existe
-      if (!document.getElementById('loader-animation')) {
-        const style = document.createElement('style');
-        style.id = 'loader-animation';
-        style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
-        document.head.appendChild(style);
-      }
-      
-      spinnerContainer.appendChild(spinner);
-      loader.appendChild(spinnerContainer);
-      document.body.appendChild(loader);
+      // Guardar posición de desplazamiento
+      const activeTab = document.querySelector('.tab.active').textContent.toLowerCase();
+      lastScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      localStorage.setItem('scrollPosition', lastScrollPosition);
+      localStorage.setItem('activeTab', activeTab);
     }
     
-    function hideLoadingIndicator() {
-      const loader = document.getElementById('app-loader');
-      if (loader) {
-        document.body.removeChild(loader);
+    function restoreFiltersAndState() {
+      // Restaurar filtros
+      sortMode = localStorage.getItem('sortMode') || 'byNameAsc'; // Default byNameAsc si no hay nada
+      currentColumns = localStorage.getItem('currentColumns') || 'pc';
+      currentCompanyFilter = localStorage.getItem('currentCompanyFilter') || '';
+      searchTerm = localStorage.getItem('searchTerm') || '';
+      
+      // Actualizar UI con los filtros restaurados
+      document.getElementById('searchInput').value = searchTerm;
+      updateCurrentCompanyLogo();
+      
+      // Restaurar pestaña activa
+      const activeTab = localStorage.getItem('activeTab') || 'pedido';
+      showTab(activeTab, false); // Pasar false para evitar renderizado duplicado
+    }
+    
+    function restoreScrollPosition() {
+      const savedPosition = parseInt(localStorage.getItem('scrollPosition') || '0');
+      if (savedPosition) {
+        window.scrollTo(0, savedPosition);
       }
     }
 
-    // Guardar los items actuales en la colección actual
-    function saveCurrentItemsToCollection(itemsToSave) {
-      const collectionId = localStorage.getItem('currentCollection') || 'default';
-      const collections = getCollections();
-      
-      if (collections[collectionId]) {
-        try {
-          // Si se pasaron items específicos, guardar esos, sino usar allItems global
-          const itemsData = itemsToSave || allItems;
-          const jsonData = JSON.stringify(itemsData);
-          
-          collections[collectionId].items = jsonData;
-          collections[collectionId].lastModified = new Date().toISOString();
-          saveCollections(collections);
-          
-          // En caso de error, guardar una copia de seguridad solo en sessionStorage
-          // Esto evita que aparezca el mensaje molesto en cada carga
-          if (Object.keys(itemsData).length > 0) {
-            sessionStorage.setItem('temp_backup', jsonData);
-          }
-          
-          // Eliminar cualquier respaldo de emergencia si el guardado fue exitoso
-          if (localStorage.getItem('emergency_backup')) {
-            localStorage.removeItem('emergency_backup');
-          }
-        } catch (e) {
-          console.error("Error al guardar la colección:", e);
-          // Solo en caso de error grave, crear una copia de emergencia real
-          localStorage.setItem('emergency_backup', JSON.stringify(itemsToSave || allItems));
-        }
-      }
-    }
-
-    // Actualizar el logo mostrado de la colección actual
-    function updateCurrentCollectionDisplay() {
-      // Obtenemos el botón de colecciones y el contenedor del logo
-      const collectionBtn = document.querySelector('.collections-menu-btn');
-      const logoContainer = document.getElementById('currentCollectionLogo');
-      if (!collectionBtn || !logoContainer) return;
-      
-      // Limpiar el contenedor del logo
-      logoContainer.innerHTML = '';
-      
-      const collection = getCurrentCollection();
-      if (collection) {
-        // Actualizar el título del botón con el nombre de la colección
-        collectionBtn.title = `Colección: ${collection.name}`;
-        
-        // Mostrar el logo o un icono por defecto
-        if (collection.logoUrl) {
-          // Si hay un logo, lo mostramos
-          const logoImg = document.createElement('img');
-          logoImg.src = collection.logoUrl;
-          logoImg.alt = collection.name;
-          logoImg.style.width = '26px';
-          logoImg.style.height = '26px';
-          logoImg.style.borderRadius = '4px';
-          logoImg.style.objectFit = 'contain';
-          logoContainer.appendChild(logoImg);
-        } else {
-          // Si no hay logo, mostramos un icono de carpeta
-          const folderIcon = document.createElement('span');
-          folderIcon.className = 'material-icons';
-          folderIcon.textContent = 'folder';
-          logoContainer.appendChild(folderIcon);
-        }
-      }
-    }
-
-    // Crear una nueva colección
-    function createNewCollection() {
-      // Crear un modal personalizado para crear la colección
-      const modal = document.createElement('div');
-      modal.className = 'modern-modal';
-      modal.id = 'newCollectionModal';
-      modal.style.position = 'fixed';
-      modal.style.inset = '0';
-      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-      modal.style.display = 'flex';
-      modal.style.justifyContent = 'center';
-      modal.style.alignItems = 'center';
-      modal.style.zIndex = '9999';
-      
-      // Contenido del modal
-      const content = document.createElement('div');
-      content.className = 'modal-content';
-      content.style.backgroundColor = '#fff';
-      content.style.borderRadius = '12px';
-      content.style.padding = '20px';
-      content.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
-      content.style.width = '90%';
-      content.style.maxWidth = '400px';
-      
-      // Título
-      const title = document.createElement('h3');
-      title.textContent = 'Nueva Colección';
-      title.style.marginTop = '0';
-      title.style.marginBottom = '15px';
-      
-      // Campo de nombre
-      const nameGroup = document.createElement('div');
-      nameGroup.className = 'form-group';
-      nameGroup.style.marginBottom = '15px';
-      
-      const nameLabel = document.createElement('label');
-      nameLabel.textContent = 'Nombre:';
-      nameLabel.style.display = 'block';
-      nameLabel.style.marginBottom = '5px';
-      
-      const nameInput = document.createElement('input');
-      nameInput.type = 'text';
-      nameInput.value = 'Nueva Colección';
-      nameInput.style.width = '100%';
-      nameInput.style.padding = '8px';
-      nameInput.style.border = '1px solid #ddd';
-      nameInput.style.borderRadius = '8px';
-      
-      nameGroup.appendChild(nameLabel);
-      nameGroup.appendChild(nameInput);
-      
-      // Campo de logo URL
-      const logoGroup = document.createElement('div');
-      logoGroup.className = 'form-group';
-      logoGroup.style.marginBottom = '15px';
-      
-      const logoLabel = document.createElement('label');
-      logoLabel.textContent = 'URL del Logo (opcional):';
-      logoLabel.style.display = 'block';
-      logoLabel.style.marginBottom = '5px';
-      
-      const logoInput = document.createElement('input');
-      logoInput.type = 'text';
-      logoInput.placeholder = 'https://ejemplo.com/imagen.png';
-      logoInput.style.width = '100%';
-      logoInput.style.padding = '8px';
-      logoInput.style.border = '1px solid #ddd';
-      logoInput.style.borderRadius = '8px';
-      
-      logoGroup.appendChild(logoLabel);
-      logoGroup.appendChild(logoInput);
-      
-      // Opción para copiar datos
-      const copyGroup = document.createElement('div');
-      copyGroup.className = 'form-group';
-      copyGroup.style.marginBottom = '15px';
-      
-      const copyCheckbox = document.createElement('input');
-      copyCheckbox.type = 'checkbox';
-      copyCheckbox.id = 'copyDataCheckbox';
-      copyCheckbox.style.marginRight = '8px';
-      
-      const copyLabel = document.createElement('label');
-      copyLabel.htmlFor = 'copyDataCheckbox';
-      copyLabel.textContent = 'Copiar datos de la colección actual';
-      
-      copyGroup.appendChild(copyCheckbox);
-      copyGroup.appendChild(copyLabel);
-      
-      // Botones
-      const buttonsDiv = document.createElement('div');
-      buttonsDiv.className = 'modal-buttons';
-      buttonsDiv.style.display = 'flex';
-      buttonsDiv.style.justifyContent = 'flex-end';
-      buttonsDiv.style.gap = '10px';
-      buttonsDiv.style.marginTop = '20px';
-      
-      const cancelBtn = document.createElement('button');
-      cancelBtn.textContent = 'Cancelar';
-      cancelBtn.style.padding = '8px 15px';
-      cancelBtn.style.background = '#f5f5f5';
-      cancelBtn.style.border = 'none';
-      cancelBtn.style.borderRadius = '8px';
-      cancelBtn.style.cursor = 'pointer';
-      
-      const createBtn = document.createElement('button');
-      createBtn.textContent = 'Crear';
-      createBtn.style.padding = '8px 15px';
-      createBtn.style.background = '#000';
-      createBtn.style.color = '#fff';
-      createBtn.style.border = 'none';
-      createBtn.style.borderRadius = '8px';
-      createBtn.style.cursor = 'pointer';
-      
-      buttonsDiv.appendChild(cancelBtn);
-      buttonsDiv.appendChild(createBtn);
-      
-      // Agregar todo al modal
-      content.appendChild(title);
-      content.appendChild(nameGroup);
-      content.appendChild(logoGroup);
-      content.appendChild(copyGroup);
-      content.appendChild(buttonsDiv);
-      modal.appendChild(content);
-      
-      // Agregar modal al body
-      document.body.appendChild(modal);
-      document.body.classList.add('body-modal-open');
-      
-      // Eventos
-      cancelBtn.onclick = function() {
-        document.body.removeChild(modal);
-        document.body.classList.remove('body-modal-open');
-      };
-      
-      createBtn.onclick = function() {
-        const name = nameInput.value.trim();
-        const logoUrl = logoInput.value.trim();
-        const shouldCopyItems = copyCheckbox.checked;
-        
-        if (!name) {
-          alert('Por favor ingresa un nombre válido.');
-          return;
-        }
-        
-        // Guardar el inventario actual primero
-        saveCurrentItemsToCollection();
-        
-        const collections = getCollections();
-        const newId = 'col_' + Date.now();
-        
-        let initialItems = '{}';
-        if (shouldCopyItems) {
-          // Copiar los datos actuales
-          initialItems = JSON.stringify(getAllItems());
-        }
-        
-        collections[newId] = {
-          name: name,
-          logoUrl: logoUrl || null,
-          items: initialItems,
-          created: new Date().toISOString(),
-          lastModified: new Date().toISOString()
-        };
-        
-        saveCollections(collections);
-        
-        selectCollection(newId);
-        
-        document.body.removeChild(modal);
-        document.body.classList.remove('body-modal-open');
-        
-        // Notificar creación exitosa
-        showNotification(`Colección "${name}" creada exitosamente.`);
-      };
-    }
-
-    // Renombrar una colección y configurar su logo
-    function renameCollection(id) {
-      const collections = getCollections();
-      if (!collections[id]) return;
-      
-      // Crear un modal personalizado para editar la colección
-      const modal = document.createElement('div');
-      modal.className = 'modern-modal';
-      modal.id = 'editCollectionModal';
-      modal.style.position = 'fixed';
-      modal.style.inset = '0';
-      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-      modal.style.display = 'flex';
-      modal.style.justifyContent = 'center';
-      modal.style.alignItems = 'center';
-      modal.style.zIndex = '9999';
-      
-      // Contenido del modal
-      const content = document.createElement('div');
-      content.className = 'modal-content';
-      content.style.backgroundColor = '#fff';
-      content.style.borderRadius = '12px';
-      content.style.padding = '20px';
-      content.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
-      content.style.width = '90%';
-      content.style.maxWidth = '400px';
-      
-      // Título
-      const title = document.createElement('h3');
-      title.textContent = 'Editar Colección';
-      title.style.marginTop = '0';
-      title.style.marginBottom = '15px';
-      
-      // Campo de nombre
-      const nameGroup = document.createElement('div');
-      nameGroup.className = 'form-group';
-      nameGroup.style.marginBottom = '15px';
-      
-      const nameLabel = document.createElement('label');
-      nameLabel.textContent = 'Nombre:';
-      nameLabel.style.display = 'block';
-      nameLabel.style.marginBottom = '5px';
-      
-      const nameInput = document.createElement('input');
-      nameInput.type = 'text';
-      nameInput.value = collections[id].name;
-      nameInput.style.width = '100%';
-      nameInput.style.padding = '8px';
-      nameInput.style.border = '1px solid #ddd';
-      nameInput.style.borderRadius = '8px';
-      
-      nameGroup.appendChild(nameLabel);
-      nameGroup.appendChild(nameInput);
-      
-      // Campo de logo URL
-      const logoGroup = document.createElement('div');
-      logoGroup.className = 'form-group';
-      logoGroup.style.marginBottom = '15px';
-      
-      const logoLabel = document.createElement('label');
-      logoLabel.textContent = 'URL del Logo (opcional):';
-      logoLabel.style.display = 'block';
-      logoLabel.style.marginBottom = '5px';
-      
-      const logoInput = document.createElement('input');
-      logoInput.type = 'text';
-      logoInput.value = collections[id].logoUrl || '';
-      logoInput.placeholder = 'https://ejemplo.com/imagen.png';
-      logoInput.style.width = '100%';
-      logoInput.style.padding = '8px';
-      logoInput.style.border = '1px solid #ddd';
-      logoInput.style.borderRadius = '8px';
-      
-      logoGroup.appendChild(logoLabel);
-      logoGroup.appendChild(logoInput);
-      
-      // Botones
-      const buttonsDiv = document.createElement('div');
-      buttonsDiv.className = 'modal-buttons';
-      buttonsDiv.style.display = 'flex';
-      buttonsDiv.style.justifyContent = 'flex-end';
-      buttonsDiv.style.gap = '10px';
-      buttonsDiv.style.marginTop = '20px';
-      
-      const cancelBtn = document.createElement('button');
-      cancelBtn.textContent = 'Cancelar';
-      cancelBtn.style.padding = '8px 15px';
-      cancelBtn.style.background = '#f5f5f5';
-      cancelBtn.style.border = 'none';
-      cancelBtn.style.borderRadius = '8px';
-      cancelBtn.style.cursor = 'pointer';
-      
-      const saveBtn = document.createElement('button');
-      saveBtn.textContent = 'Guardar';
-      saveBtn.style.padding = '8px 15px';
-      saveBtn.style.background = '#000';
-      saveBtn.style.color = '#fff';
-      saveBtn.style.border = 'none';
-      saveBtn.style.borderRadius = '8px';
-      saveBtn.style.cursor = 'pointer';
-      
-      buttonsDiv.appendChild(cancelBtn);
-      buttonsDiv.appendChild(saveBtn);
-      
-      // Agregar todo al modal
-      content.appendChild(title);
-      content.appendChild(nameGroup);
-      content.appendChild(logoGroup);
-      content.appendChild(buttonsDiv);
-      modal.appendChild(content);
-      
-      // Agregar modal al body
-      document.body.appendChild(modal);
-      document.body.classList.add('body-modal-open');
-      
-      // Eventos
-      cancelBtn.onclick = function() {
-        document.body.removeChild(modal);
-        document.body.classList.remove('body-modal-open');
-      };
-      
-      saveBtn.onclick = function() {
-        const newName = nameInput.value.trim();
-        const logoUrl = logoInput.value.trim();
-        
-        if (!newName) {
-          alert('Por favor ingresa un nombre válido.');
-          return;
-        }
-        
-        collections[id].name = newName;
-        collections[id].logoUrl = logoUrl || null;
-        collections[id].lastModified = new Date().toISOString();
-        
-        saveCollections(collections);
-        
-        // Si es la colección actual, actualizar el display
-        if (id === (localStorage.getItem('currentCollection') || 'default')) {
-          updateCurrentCollectionDisplay();
-        }
-        
-        buildCollectionsMenu();
-        
-        document.body.removeChild(modal);
-        document.body.classList.remove('body-modal-open');
-      };
-    }
-
-    // Duplicar una colección
-    function duplicateCollection(id) {
-      const collections = getCollections();
-      if (!collections[id]) return;
-      
-      const newId = 'col_' + Date.now();
-      // Crear un nuevo objeto con todas las propiedades de la colección original
-      collections[newId] = {
-        ...collections[id],
-        name: collections[id].name + ' (Copia)',
-        // Conservar el logoUrl si existe
-        logoUrl: collections[id].logoUrl,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString()
-      };
-      
-      saveCollections(collections);
-      selectCollection(newId);
-      
-      // Mostrar notificación de éxito
-      showNotification(`Colección "${collections[newId].name}" creada como copia.`);
-    }
-
-    // Eliminar una colección
-    function deleteCollection(id) {
-      const collections = getCollections();
-      if (!collections[id] || Object.keys(collections).length <= 1) return;
-      
-      if (!confirm(`¿Estás seguro de eliminar la colección "${collections[id].name}"?`)) {
-        return;
-      }
-      
-      // Si la colección a eliminar es la actual, cambiar a otra
-      const currentId = localStorage.getItem('currentCollection') || 'default';
-      if (id === currentId) {
-        // Encontrar otra colección para seleccionar
-        const otherIds = Object.keys(collections).filter(k => k !== id);
-        if (otherIds.length > 0) {
-          selectCollection(otherIds[0]);
-        }
-      }
-      
-      // Eliminar la colección
-      delete collections[id];
-      saveCollections(collections);
-      
-      // Actualizar menú
-      buildCollectionsMenu();
-    }
+    // Funciones para obtener/guardar listas
+    function getUnits() { return JSON.parse(localStorage.getItem(UNITS_KEY) || '["pz", "kg", "lt"]'); }
+    function getPresentations() { return JSON.parse(localStorage.getItem(PRESENTATIONS_KEY) || '["caja", "paquete", "costal", "pieza"]'); }
+    function getCategories() { return JSON.parse(localStorage.getItem(CATEGORIES_KEY) || '["General", "Alimentos", "Limpieza"]'); }
+    function getCompanies() { return JSON.parse(localStorage.getItem(COMPANIES_KEY) || '[]'); }
 
     /* ===== FUNCIONES DE INVENTARIO ===== */
     function getAllItems() {
       try {
-        // Si ya tenemos datos cargados en la variable global, usarlos
-        if (allItems && Object.keys(allItems).length > 0) {
-          return allItems;
-        }
-        
-        // Usar la estructura de colecciones para cargar los datos
-        const collection = getCurrentCollection();
-        if (collection && collection.items) {
-          try {
-            // Parsear los datos de la colección
-            const parsed = JSON.parse(collection.items);
-            
-            // Actualizar la variable global
-            allItems = parsed;
-            
-            console.log("Inventario cargado de colección actual:", Object.keys(parsed).length, "elementos");
-            return parsed;
-          } catch (parseError) {
-            console.error("Error al parsear datos de colección:", parseError);
-          }
-        }
-        
-        // Si no hay colección o hubo error, intentar cargar del almacenamiento antiguo
         const raw = localStorage.getItem('inventory_v2_moderno');
-        if (raw && raw !== '{}' && raw !== 'null') {
-          try {
-            const parsed = JSON.parse(raw);
-            console.log("Inventario cargado de almacenamiento antiguo:", Object.keys(parsed).length, "elementos");
-            return parsed;
-          } catch (parseError) {
-            console.error("Error al parsear datos antiguos:", parseError);
-          }
-        }
-        
-        // Si todo lo anterior falla, devolver un objeto vacío
-        console.warn("No se encontraron datos de inventario. Devolviendo objeto vacío.");
-        return {};
+        return raw ? JSON.parse(raw) : {};
       } catch (e) {
         console.error("Error al cargar inventario:", e);
         return {};
@@ -3118,126 +2130,21 @@
 
     function setAllItems(obj) {
       try {
-        // Guardar en la estructura de colecciones
-        saveCurrentItemsToCollection(obj);
-        
-        // También guardar en almacenamiento antiguo por compatibilidad
         localStorage.setItem('inventory_v2_moderno', JSON.stringify(obj));
       } catch (e) {
         console.error("Error al guardar inventario:", e);
       }
     }
 
-    // Función getCompanies para obtener compañías desde localStorage
-    function getCompanies() {
-      try {
-        const companiesStr = localStorage.getItem(COMPANIES_KEY);
-        return companiesStr ? JSON.parse(companiesStr) : [];
-      } catch (e) {
-        console.error("Error al cargar compañías:", e);
-        return [];
-      }
-    }
-    
-    // Función para escapar caracteres HTML en texto, previene inyección de código
-    function escapeHtml(text) {
-      if (!text) return '';
-      const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return String(text).replace(/[&<>"']/g, m => map[m]);
-    }
-    
-    // Función para obtener unidades desde localStorage
-    function getUnits() {
-      try {
-        const unitsStr = localStorage.getItem(UNITS_KEY);
-        return unitsStr ? JSON.parse(unitsStr) : ['pz', 'caja', 'kg', 'lb', 'galón'];
-      } catch (e) {
-        console.error("Error al cargar unidades:", e);
-        return ['pz', 'caja', 'kg', 'lb', 'galón']; // Unidades por defecto
-      }
-    }
-
-    // Función para obtener presentaciones desde localStorage
-    function getPresentations() {
-      try {
-        const presentationsStr = localStorage.getItem(PRESENTATIONS_KEY);
-        return presentationsStr ? JSON.parse(presentationsStr) : ['caja', 'pieza', 'paquete', 'bolsa'];
-      } catch (e) {
-        console.error("Error al cargar presentaciones:", e);
-        return ['caja', 'pieza', 'paquete', 'bolsa']; // Presentaciones por defecto
-      }
-    }
-
-    // Función para obtener categorías desde localStorage
-    function getCategories() {
-      try {
-        const categoriesStr = localStorage.getItem(CATEGORIES_KEY);
-        return categoriesStr ? JSON.parse(categoriesStr) : ['General', 'Alimentos', 'Bebidas', 'Limpieza'];
-      } catch (e) {
-        console.error("Error al cargar categorías:", e);
-        return ['General', 'Alimentos', 'Bebidas', 'Limpieza']; // Categorías por defecto
-      }
-    }
-
-    // Variables globales ya declaradas en la parte superior
-    // No necesitamos redeclararlas
+    // Variables globales
+    let searchTerm = "";
+    let currentCompanyFilter = "";
+    let sortMode = localStorage.getItem('sortMode') || 'byNameAsc';
+    let currentColumns = localStorage.getItem('currentColumns') || 'pc';
+    let currentEdit = null;
+    let lastScrollPosition = 0;
+    let currentOrderPDFFile = null; // Para almacenar el PDF generado para compartir
     window.longPressTimer = null; // Para el temporizador de pulsación larga
-
-    // Función para guardar los filtros y el estado actual
-    function saveFiltersAndState() {
-      localStorage.setItem('searchTerm', searchTerm || '');
-      localStorage.setItem('currentCompanyFilter', currentCompanyFilter || '');
-      localStorage.setItem('currentColumns', currentColumns || 'pc');
-      localStorage.setItem('currentSortMode', currentSortMode || 'byNameAsc');
-      localStorage.setItem('scrollPos', window.scrollY || 0);
-      
-      // Guardar también la colección actual
-      localStorage.setItem('currentCollection', currentCollection || 'default');
-    }
-
-    // Función para restaurar los filtros y el estado guardados
-    function restoreFiltersAndState() {
-      // Restaurar términos de búsqueda
-      searchTerm = localStorage.getItem('searchTerm') || '';
-      document.getElementById('searchInput').value = searchTerm;
-
-      // Restaurar filtro de compañía
-      currentCompanyFilter = localStorage.getItem('currentCompanyFilter') || '';
-      
-      // Restaurar columnas y modo de ordenamiento
-      currentColumns = localStorage.getItem('currentColumns') || 'pc';
-      currentSortMode = localStorage.getItem('currentSortMode') || 'byNameAsc';
-      sortMode = currentSortMode; // Mantener compatibilidad con código existente
-
-      // Aplicar configuración en la UI
-      updateSearchTerm(searchTerm);
-      updateCompanyFilter(currentCompanyFilter);
-    }
-
-    // Función auxiliar para actualizar el término de búsqueda
-    function updateSearchTerm(term) {
-      if (!term) return;
-      searchTerm = term;
-      // Actualizar input si existe
-      const searchInput = document.getElementById('searchInput');
-      if (searchInput && searchInput.value !== term) {
-        searchInput.value = term;
-      }
-    }
-
-    // Función auxiliar para actualizar el filtro de compañía
-    function updateCompanyFilter(companyName) {
-      if (companyName === currentCompanyFilter) return;
-      currentCompanyFilter = companyName || '';
-      // Actualizar UI si hay cambios
-      updateCurrentCompanyLogo();
-    }
 
     // Funciones para la interfaz
     function showTab(tabName, shouldRender = true) {
@@ -3279,9 +2186,6 @@
         saveFiltersAndState(); // <--- Añadida esta línea al final del bloque if
       }
       // Si !shouldRender (es decir, durante la carga inicial), initApp se encargará de la opacidad DESPUÉS del scroll.
-    
-      // Ajustar el margen del contenido después de mostrar la pestaña y renderizar
-      adjustContentMargin();
     }
 
     function updateDeleteButtons() {
@@ -3348,7 +2252,7 @@
         });
       } 
       if (currentCompanyFilter) {
-        entries = entries.filter(([, data]) => data && data.company && data.company.toLowerCase() === currentCompanyFilter.toLowerCase());
+        entries = entries.filter(([, data]) => data && data.company === currentCompanyFilter);
     }
     
       // Ordenar entradas usando la función de ordenación
@@ -3698,7 +2602,7 @@
         });
       }
       if (currentCompanyFilter) {
-        entries = entries.filter(([, data]) => data && data.company && data.company.toLowerCase() === currentCompanyFilter.toLowerCase());
+        entries = entries.filter(([, data]) => data && data.company === currentCompanyFilter);
       }
       
       // Ordenar entradas usando la nueva función de ordenación
@@ -3990,7 +2894,7 @@
         });
       }
       if (currentCompanyFilter) {
-        entries = entries.filter(([, data]) => data && data.company && data.company.toLowerCase() === currentCompanyFilter.toLowerCase());
+        entries = entries.filter(([, data]) => data && data.company === currentCompanyFilter);
       }
       
       // Ordenar entradas usando la nueva función de ordenación
@@ -4149,7 +3053,7 @@
 
     function toggleViewOptions() {
       const menu = document.getElementById('viewOptions');
-      menu.classList.toggle('show');
+      menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
     }
 
     /* ===== EDICIÓN DE PRODUCTOS ===== */
@@ -4174,32 +3078,18 @@
       document.getElementById('editUnidadesPorCaja').value = '';
       document.getElementById('editPaquetesPorCaja').value = '';
       
-      try {
       // Llenar selects
       fillSelectOptions('editUnit', getUnits());
       fillSelectOptions('editPresentation', getPresentations());
       fillSelectOptions('editCompany', getCompanies().map(c => c.name));
-        
-        // Arreglo: pasar null en lugar de nombre (que no está definido)
-        fillCustomSortPositionSelect(null);
-      } catch (e) {
-        console.error('Error al llenar campos del modal:', e);
-      }
+      fillCustomSortPositionSelect(currentEdit ? name : null); // Llenar select de orden personalizado
       
       // Limpiar precios
       document.getElementById('priceContainer').innerHTML = '';
       
       // Mostrar modal
-      const modal = document.getElementById('editModal');
-      if (modal) {
-        modal.classList.add('show');
-        // Asegurar que sea visible
-        modal.style.display = 'flex';
+      document.getElementById('editModal').classList.add('show');
       document.body.classList.add('body-modal-open'); // Bloquear scroll
-        console.log('Modal de nuevo producto abierto');
-      } else {
-        console.error('No se encontró el modal de edición');
-      }
     }
 
     function editItem(name) {
@@ -4245,18 +3135,8 @@
       }
       
       // Mostrar modal
-      const modal = document.getElementById('editModal');
-      if (modal) {
-        modal.classList.add('show');
-        // Asegurar que sea visible según los estilos CSS (.modal.show)
-        modal.style.display = 'flex';
-        modal.style.opacity = '1';
-        modal.style.pointerEvents = 'auto';
+      document.getElementById('editModal').classList.add('show');
       document.body.classList.add('body-modal-open'); // Bloquear scroll
-        console.log('Modal de edición mostrado');
-      } else {
-        console.error('No se encontró el modal de edición');
-      }
     }
 
     function fillSelectOptions(selectId, options, selectedValue = null) {
@@ -4397,16 +3277,8 @@
     }
 
     function closeModal() {
-      const modal = document.getElementById('editModal');
-      if (modal) {
-        modal.classList.remove('show');
-        // Restaurar propiedades originales
-        modal.style.display = '';
-        modal.style.opacity = '';
-        modal.style.pointerEvents = '';
+      document.getElementById('editModal').classList.remove('show');
       document.body.classList.remove('body-modal-open'); // Desbloquear scroll
-        console.log('Modal de edición cerrado');
-      }
       currentEdit = null;
     }
 
@@ -4620,58 +3492,16 @@
     /* ===== FUNCIONES DE COMPAÑÍA ===== */
     // Event listener para cerrar el popup al hacer clic en cualquier parte
     document.addEventListener('click', function(event) {
-      const target = event.target;
-
-      // 1. Company Popup
-      const companyPopup = document.getElementById('companyPopup');
-      const companyPopupButton = document.querySelector('.store-icon-btn'); 
+      const popup = document.getElementById('companyPopup');
+      const companySelector = document.querySelector('.company-selector');
       
-      if (companyPopup && companyPopup.classList.contains('show')) {
-        // Cerrar si el clic NO es en el botón que lo abre Y NO es dentro del popup
-        if (companyPopupButton && !companyPopupButton.contains(target) && !companyPopup.contains(target)) {
-          companyPopup.classList.remove('show');
-        }
-      }
-
-      // 2. View Options Popup
-      const viewOptionsPopup = document.getElementById('viewOptions');
-      // El botón de opciones de vista ahora es el segundo .header-icon-btn en .header-icon-group-right
-      const viewOptionsButton = document.querySelector('.header-icon-group-right .header-icon-btn:nth-child(2)'); 
-
-      if (viewOptionsPopup && viewOptionsPopup.style.display === 'flex') {
-        // Cerrar si el clic NO es en el botón que lo abre Y NO es dentro del popup
-        if (viewOptionsButton && !viewOptionsButton.contains(target) && !viewOptionsPopup.contains(target)) {
-          toggleViewOptions(); // Esta función maneja el cierre/apertura
-        }
-      }
-
-      // 3. Info Badge Modal (Carrito)
-      const infoBadgeModal = document.getElementById('infoBadgeModal');
-      const infoBadgeButton = document.getElementById('infoBadgeBtn'); // Botón que abre este modal
-
-      if (infoBadgeModal && infoBadgeModal.classList.contains('show')) {
-        const modalContent = infoBadgeModal.querySelector('.info-badge-modal-content');
-        // Cerrar si el clic es en el backdrop (directamente en infoBadgeModal pero no en su contenido) 
-        // O si es fuera del contenido y NO en el botón que lo abre.
-        if (target === infoBadgeModal || 
-            (modalContent && !modalContent.contains(target) && infoBadgeButton && !infoBadgeButton.contains(target)) ) {
-          closeInfoBadgeModal();
-        }
-      }
-
-      // 4. Collections Menu
-      const collectionsMenuButton = document.querySelector('.collections-menu-btn'); // Botón de colecciones
-      const collectionsMenu = document.getElementById('collectionsMenu'); // Menú de colecciones
-
-      if (collectionsMenu && collectionsMenu.classList.contains('show')) {
-        // Cerrar si el clic NO es en el botón que lo abre Y NO es dentro del popup
-        if (collectionsMenuButton && !collectionsMenuButton.contains(target) && !collectionsMenu.contains(target)) {
-          collectionsMenu.classList.remove('show');
-           document.removeEventListener('click', closeCollectionsMenuOutside); // Asegurar que se remueve el listener si se cierra por aquí
-        }
+      // Si el popup está abierto y se hace clic fuera del popup y del selector
+      if (popup.classList.contains('show') && 
+          !popup.contains(event.target) && 
+          !companySelector.contains(event.target)) {
+        popup.classList.remove('show');
       }
     });
-    // --- FIN NUEVAS FUNCIONES --- (Este comentario podría haber sido de una tanda anterior de funciones)
 
     function toggleCompanyPopup(event) {
       if (event) {
@@ -4715,16 +3545,21 @@
     }
 
     function selectCompany(name) {
-      console.log("Seleccionando compañía:", name); // Log para depuración
       currentCompanyFilter = name;
-      
       toggleCompanyPopup(); // Esto debería cerrar el popup
+      // updateCurrentCompanyLogo(); // Ya no hay un logo visible permanente para actualizar aquí.
+      // Sin embargo, la lógica de filtrado y guardado debe permanecer.
       saveFiltersAndState();
       renderTabs();
-      updateCurrentCompanyLogo();
+      updateCurrentCompanyLogo(); // <--- AÑADIR ESTA LLAMADA AQUÍ
     }
 
     function updateCurrentCompanyLogo() {
+      // const logoElem = document.getElementById('currentCompanyLogo'); // Elemento ya no existe
+      // if (!logoElem) return; 
+
+      // Esta función ahora podría usarse para actualizar el 'title' del botón de tienda
+      // o alguna otra indicación visual si se decide implementar.
       const storeButton = document.querySelector('.store-icon-btn');
       if (storeButton) {
         if (!currentCompanyFilter) {
@@ -4733,7 +3568,17 @@
           storeButton.title = `Compañía: ${currentCompanyFilter}`;
         }
       }
-      
+      // La lógica original que actualizaba un img src ya no es necesaria.
+      /*
+      if (!currentCompanyFilter) {
+        logoElem.src = APP_DEFAULT_LOGO;
+      } else {
+        const comp = getCompanies().find(c => c.name === currentCompanyFilter);
+        logoElem.src = comp && comp.image ? comp.image : APP_DEFAULT_LOGO;
+      }
+      */
+
+      // Nueva lógica para actualizar el icono/logo del botón de tienda
       const iconContainer = document.getElementById('storeButtonIconContainer');
       if (!iconContainer) return;
 
@@ -5400,7 +4245,7 @@
       
       // Información de la Compañía (si está filtrada)
       if (currentCompanyFilter) {
-        const company = getCompanies().find(c => c.name.toLowerCase() === currentCompanyFilter.toLowerCase());
+        const company = getCompanies().find(c => c.name === currentCompanyFilter);
         if (company) {
           yPos += 5; // Espacio antes de la info de la compañía
           const companyNameForPDF = company.name.toUpperCase();
@@ -5454,7 +4299,7 @@
       });
 
       if (currentCompanyFilter) { // Aplicar filtro de compañía a los items del PDF
-        entries = entries.filter(([, data]) => data && data.company && data.company.toLowerCase() === currentCompanyFilter.toLowerCase());
+        entries = entries.filter(([, data]) => data && data.company === currentCompanyFilter);
       }
       // No aplicamos filtro de búsqueda (searchTerm) al PDF, usualmente se quiere el pedido completo de la compañía.
 
@@ -5576,6 +4421,787 @@
         localStorage.setItem('scrollPosition', lastScrollPosition);
       }, 300);
     });
+    
+    // Manejador de errores global
+    window.addEventListener('error', function(e) {
+      console.error("Error capturado:", e.error);
+      // Prevenir pantalla en blanco
+      if (splash.style.display === 'flex') {
+        splash.style.display = 'none';
+      }
+    });
+    
+    // Función para limpiar texto de código visible en la interfaz
+    function cleanupCodeText() {
+      // Buscar nodos de texto en el cuerpo del documento
+      const walker = document.createTreeWalker(
+        document.body, 
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+      );
+      
+      const nodesToRemove = [];
+      let node;
+      
+      // Recolectar nodos que contienen código
+      while(node = walker.nextNode()) {
+        // Buscar fragmentos de código específicos
+        if (node.nodeValue && (
+            node.nodeValue.includes('logoFileInput.value') || 
+            node.nodeValue.includes('companies.push') ||
+            node.nodeValue.includes('localStorage.setItem(COMPANIES_KEY') ||
+            node.nodeValue.includes('renderSettingsLists')
+           )) {
+          nodesToRemove.push(node);
+        }
+      }
+      
+      // Eliminar los nodos encontrados
+      nodesToRemove.forEach(node => {
+        if (node.parentNode) {
+          node.parentNode.removeChild(node);
+        }
+      });
+      
+      // Programar ejecuciones periódicas para capturar texto que aparezca después
+      setTimeout(cleanupCodeText, 2000);
+    }
+
+    /* ===== FUNCIONES MODAL ZOOM IMAGEN ===== */
+    function showImageZoomModal(imageUrl, productName) {
+      if (!imageUrl) return;
+      document.getElementById('zoomedImage').src = imageUrl;
+      document.getElementById('zoomedImage').alt = productName;
+      document.getElementById('imageZoomModal').classList.add('show');
+      document.body.classList.add('body-modal-open'); // Bloquear scroll
+      
+      // Implementar zoom con gestos táctiles y mouse
+      const zoomedImage = document.getElementById('zoomedImage');
+      
+      // Variables para el zoom
+      let scale = 1;
+      let panning = false;
+      let pointX = 0;
+      let pointY = 0;
+      let start = { x: 0, y: 0 };
+      
+      // Función para actualizar la transformación
+      function updateTransform() {
+        zoomedImage.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+      }
+      
+      // Eventos para PC (mouse)
+      zoomedImage.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        start = { x: e.clientX - pointX, y: e.clientY - pointY };
+        panning = true;
+      });
+      
+      zoomedImage.addEventListener('mouseup', (e) => {
+        panning = false;
+      });
+      
+      zoomedImage.addEventListener('mousemove', (e) => {
+        e.preventDefault();
+        if (!panning) return;
+        pointX = (e.clientX - start.x);
+        pointY = (e.clientY - start.y);
+        updateTransform();
+      });
+      
+      zoomedImage.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const xs = (e.clientX - pointX) / scale;
+        const ys = (e.clientY - pointY) / scale;
+        const delta = -e.deltaY * 0.01;
+        
+        // Limitar el zoom entre 0.5 y 4
+        scale = Math.min(Math.max(0.5, scale + delta), 4);
+        
+        pointX = e.clientX - xs * scale;
+        pointY = e.clientY - ys * scale;
+        
+        updateTransform();
+      });
+      
+      // Eventos para móviles (táctil)
+      let evCache = [];
+      let prevDiff = -1;
+      
+      zoomedImage.addEventListener('touchstart', (e) => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          evCache.push(e.changedTouches[i]);
+        }
+        if (evCache.length === 1) {
+          start = { x: evCache[0].clientX - pointX, y: evCache[0].clientY - pointY };
+          panning = true;
+        }
+      });
+      
+      zoomedImage.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const idx = evCache.findIndex(item => item.identifier === e.changedTouches[i].identifier);
+          if (idx !== -1) evCache[idx] = e.changedTouches[i];
+        }
+        
+        // Manejar desplazamiento con un dedo
+        if (evCache.length === 1 && panning) {
+          pointX = (evCache[0].clientX - start.x);
+          pointY = (evCache[0].clientY - start.y);
+          updateTransform();
+        } 
+        // Manejar zoom con dos dedos (pinch)
+        else if (evCache.length === 2) {
+          const curDiff = Math.hypot(
+            evCache[0].clientX - evCache[1].clientX,
+            evCache[0].clientY - evCache[1].clientY
+          );
+          
+          if (prevDiff > 0) {
+            // Aumentar o disminuir escala según el gesto de pinch
+            if (curDiff > prevDiff) {
+              // Los dedos se separan, aumentar zoom
+              scale = Math.min(scale * 1.02, 4);
+            }
+            if (curDiff < prevDiff) {
+              // Los dedos se juntan, disminuir zoom
+              scale = Math.max(scale * 0.98, 0.5);
+            }
+            
+            updateTransform();
+          }
+          
+          prevDiff = curDiff;
+        }
+      });
+      
+      function touchEndHandler(e) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const idx = evCache.findIndex(item => item.identifier === e.changedTouches[i].identifier);
+          if (idx !== -1) evCache.splice(idx, 1);
+        }
+        
+        if (evCache.length < 2) prevDiff = -1;
+        if (evCache.length === 0) panning = false;
+      }
+      
+      zoomedImage.addEventListener('touchend', touchEndHandler);
+      zoomedImage.addEventListener('touchcancel', touchEndHandler);
+      
+      // Doble clic/toque para resetear zoom
+      let lastTap = 0;
+      
+      zoomedImage.addEventListener('click', (e) => {
+        const curTime = new Date().getTime();
+        const tapLength = curTime - lastTap;
+        
+        if (tapLength < 300 && tapLength > 0) {
+          // Doble clic detectado, resetear zoom
+          scale = 1;
+          pointX = 0;
+          pointY = 0;
+          updateTransform();
+          e.preventDefault();
+        }
+        
+        lastTap = curTime;
+      });
+      
+      // Asegurarse de que el cursor refleje el estado de zoom
+      zoomedImage.style.cursor = 'zoom-in';
+    }
+
+    function closeImageZoomModal() {
+      document.getElementById('imageZoomModal').classList.remove('show');
+      document.getElementById('zoomedImage').src = ""; // Limpiar src para evitar que se muestre imagen anterior brevemente
+      document.getElementById('zoomedImage').style.transform = ''; // Resetear transformación
+      document.body.classList.remove('body-modal-open'); // Desbloquear scroll
+    }
+
+    // Función para ordenar entradas según el modo seleccionado
+    function sortEntriesByCurrentMode(entries) {
+      const sortModeToUse = sortMode; // Usar la variable global sortMode
+
+      if (sortModeToUse === 'byCustomOrder') {
+        return entries.sort((a, b) => {
+          const orderA = a[1]?.customSortOrder ?? Number.MAX_SAFE_INTEGER; // Los que no tengan orden, al final
+          const orderB = b[1]?.customSortOrder ?? Number.MAX_SAFE_INTEGER;
+          if (orderA === orderB) { // Si el orden personalizado es igual, usar nombre como secundario
+            return a[0].localeCompare(b[0]);
+          }
+          return orderA - orderB;
+        });
+      }
+      if (sortMode === 'byNumberAsc') {
+        return entries.sort((a, b) => {
+          // Convertir números de producto a enteros para comparación numérica
+          const numA = parseInt(a[1]?.numero || "0", 10);
+          const numB = parseInt(b[1]?.numero || "0", 10);
+          
+          // Si los números son iguales, ordenar por nombre
+          if (numA === numB) {
+            return a[0].localeCompare(b[0]);
+          }
+          
+          return numA - numB; // Orden ascendente
+        });
+      } 
+      else if (sortMode === 'byNumberDesc') {
+        return entries.sort((a, b) => {
+          const numA = parseInt(a[1]?.numero || "0", 10);
+          const numB = parseInt(b[1]?.numero || "0", 10);
+          
+          if (numA === numB) {
+            return a[0].localeCompare(b[0]);
+          }
+          
+          return numB - numA; // Orden descendente
+        });
+      } 
+      else if (sortMode === 'byNameDesc') {
+        return entries.sort((a, b) => b[0].localeCompare(a[0]));
+      } 
+      else {
+        // Por defecto: byNameAsc
+        return entries.sort((a, b) => a[0].localeCompare(b[0]));
+      }
+    }
+
+    // --- INICIO FUNCIONES PARA BOTONES +/- ---
+    function parseQuantity(value) {
+      if (value === "1/2") return 0.5;
+      if (value === null || value === undefined || value === "") return 0;
+      const num = parseFloat(String(value)); // Convertir a string primero por si es 0 (número)
+      return isNaN(num) ? 0 : num;
+    }
+
+    function formatQuantity(num) {
+      if (num === 0) return 0; // Devuelve el número 0 para "sin cantidad"
+      if (num === 0.5) return "1/2";
+      return String(num);
+    }
+
+    function incrementQuantity(event, productName) {
+      const items = getAllItems();
+      if (!items[productName]) return;
+
+      // Resetear el botón de decremento si estaba en modo confirmación
+      const decreaseButton = event.target.parentElement.querySelector('.decrease-qty-btn');
+      if (decreaseButton && decreaseButton.dataset.confirmDelete === 'true') {
+        decreaseButton.innerHTML = '-';
+        delete decreaseButton.dataset.confirmDelete;
+        delete decreaseButton.dataset.isPressing; // Asegurar limpieza
+        clearTimeout(window.longPressTimer);
+      }
+
+      let currentQtyNum = parseQuantity(items[productName].pedidoQty);
+      currentQtyNum += 1;
+      items[productName].pedidoQty = formatQuantity(currentQtyNum);
+      
+      setAllItems(items);
+      updateProductQuantityUI(productName, items[productName].pedidoQty, 'pedido');
+      updateItemCount(); // Actualizar contador general
+    }
+
+    function decrementQuantity(productName) { // Ya no necesita el botón como argumento si solo hace la lógica
+      const items = getAllItems();
+      if (!items[productName]) return;
+
+      let currentQtyNum = parseQuantity(items[productName].pedidoQty);
+
+      if (currentQtyNum <= 0) { // No debería llegar aquí si el botón desaparece, pero por seguridad
+        currentQtyNum = 0;
+      } else if (currentQtyNum === 0.5) {
+        currentQtyNum = 0;
+      } else {
+        currentQtyNum -= 1;
+      }
+      
+      if (currentQtyNum < 0) currentQtyNum = 0;
+
+      items[productName].pedidoQty = formatQuantity(currentQtyNum);
+      
+      setAllItems(items);
+      updateProductQuantityUI(productName, items[productName].pedidoQty, 'pedido');
+      updateItemCount(); // Actualizar contador general
+    }
+
+    function incrementInventoryQuantity(event, productName) {
+      const items = getAllItems();
+      if (!items[productName]) return;
+
+      // Resetear el botón de decremento si estaba en modo confirmación
+      const decreaseButton = event.target.parentElement.querySelector('.decrease-qty-btn');
+      if (decreaseButton && decreaseButton.dataset.confirmDelete === 'true') {
+        decreaseButton.innerHTML = '-';
+        delete decreaseButton.dataset.confirmDelete;
+        delete decreaseButton.dataset.isPressing; // Asegurar limpieza
+        clearTimeout(window.longPressTimer);
+      }
+
+      let currentQtyNum = parseQuantity(items[productName].inventarioQty);
+      currentQtyNum += 1;
+      items[productName].inventarioQty = formatQuantity(currentQtyNum);
+
+      setAllItems(items);
+      updateProductQuantityUI(productName, items[productName].inventarioQty, 'inventario');
+      updateItemCount(); // Actualizar contador general
+    }
+
+    function decrementInventoryQuantity(productName) { // Ya no necesita el botón como argumento
+      const items = getAllItems();
+      if (!items[productName]) return;
+
+      let currentQtyNum = parseQuantity(items[productName].inventarioQty);
+
+      if (currentQtyNum <= 0) {
+        currentQtyNum = 0;
+      } else if (currentQtyNum === 0.5) {
+        currentQtyNum = 0;
+      } else {
+        currentQtyNum -= 1;
+      }
+
+      if (currentQtyNum < 0) currentQtyNum = 0;
+      
+      items[productName].inventarioQty = formatQuantity(currentQtyNum);
+
+      setAllItems(items);
+      updateProductQuantityUI(productName, items[productName].inventarioQty, 'inventario');
+      updateItemCount(); // Actualizar contador general
+    }
+    // --- FIN FUNCIONES PARA BOTONES +/- ---
+
+    // --- INICIO NUEVAS FUNCIONES PARA PULSACIÓN LARGA Y BOTONES DE CANTIDAD ---
+    function createQuantityButton(type, productName, tabType) {
+      const button = document.createElement('button');
+      button.type = "button";
+      button.className = 'quantity-btn';
+      button.setAttribute('data-product', productName);
+
+      if (type === 'increase') {
+        button.innerHTML = '+';
+        button.classList.add('increase-qty-btn'); // Clase para identificarlo
+        if (tabType === 'pedido' || tabType === 'orden') {
+          button.onclick = function(event) { incrementQuantity(event, productName); return false; };
+        } else { // inventario
+          button.onclick = function(event) { incrementInventoryQuantity(event, productName); return false; };
+        }
+      } else { // decrease
+        button.innerHTML = '-';
+        button.classList.add('decrease-qty-btn'); // Clase para identificarlo
+        button.onmousedown = function(event) { handleDecrementButtonDown(event, productName, tabType); };
+        button.onmouseup = function(event) { handleDecrementButtonUpOrLeave(event, productName, tabType); };
+        button.onmouseleave = function(event) { handleDecrementButtonUpOrLeave(event, productName, tabType); };
+        button.ontouchstart = function(event) { handleDecrementButtonDown(event, productName, tabType); };
+        button.ontouchend = function(event) { handleDecrementButtonUpOrLeave(event, productName, tabType); };
+        button.onclick = function(event) { handleDecrementButtonClick(event, productName, tabType); return false; };
+      }
+      return button;
+    }
+
+    function handleDecrementButtonDown(event, productName, tabType) {
+      const button = event.currentTarget;
+      clearTimeout(window.longPressTimer);
+      button.dataset.isPressing = "true";
+
+      window.longPressTimer = setTimeout(() => {
+        if (button.dataset.isPressing === "true") {
+          button.innerHTML = '<i class="material-icons" style="font-size: 1em; vertical-align: middle; line-height: 1;">delete</i>';
+          button.dataset.confirmDelete = "true";
+          if (navigator.vibrate) navigator.vibrate(50);
+        }
+      }, 300); // Cambiado de 1000ms a 300ms (0.3 segundo)
+      // event.preventDefault(); // Podría ser necesario para touchstart, probar con cuidado
+    }
+
+    function handleDecrementButtonUpOrLeave(event, productName, tabType) {
+      const button = event.currentTarget;
+      clearTimeout(window.longPressTimer);
+      delete button.dataset.isPressing;
+      // No cambiar la cantidad ni el ícono aquí, el onclick se encargará.
+    }
+
+    function handleDecrementButtonClick(event, productName, tabType) {
+      const button = event.currentTarget;
+      clearTimeout(window.longPressTimer); // Asegurar que el timer se limpie
+      
+      if (button.dataset.confirmDelete === "true") {
+        // Modo basura activo: poner cantidad a 0
+        setProductQuantityToZero(productName, tabType);
+        button.innerHTML = "-"; // Restaurar ícono
+        delete button.dataset.confirmDelete; // Limpiar estado
+      } else {
+        // Clic corto normal: decrementar cantidad
+        if (tabType === 'pedido' || tabType === 'orden') {
+          decrementQuantity(productName);
+        } else { // inventario
+          decrementInventoryQuantity(productName);
+        }
+      }
+      delete button.dataset.isPressing; // Limpiar estado de presión por si acaso
+    }
+
+    function setProductQuantityToZero(productName, tabType) {
+      const items = getAllItems();
+      if (!items[productName]) return;
+
+      let qtyChanged = false;
+      if (tabType === 'pedido' || tabType === 'orden') {
+        if (items[productName].pedidoQty !== 0 && items[productName].pedidoQty !== "0") {
+           items[productName].pedidoQty = 0;
+           qtyChanged = true;
+        }
+      } else { // inventario
+         if (items[productName].inventarioQty !== 0 && items[productName].inventarioQty !== "0") {
+            items[productName].inventarioQty = 0;
+            qtyChanged = true;
+         }
+      }
+
+      if (qtyChanged) {
+        setAllItems(items);
+        // La función updateProductQuantityUI se encargará de actualizar la UI del ítem,
+        // incluyendo ocultar el botón '-' si la cantidad es 0.
+        // Si estamos en 'orden', un renderOrdenTab podría ser más simple para asegurar que el ítem desaparezca.
+        if (tabType === 'orden') {
+            renderOrdenTab();
+        } else {
+            updateProductQuantityUI(productName, 0, tabType);
+        }
+        updateItemCount(); // Actualizar contador general
+      }
+    }
+    // --- FIN NUEVAS FUNCIONES ---
+
+    // Helper function to update UI without full reload
+    function updateProductQuantityUI(productName, newQty, tab) {
+      // Considerar como "sin cantidad" si el valor es 0, '0' o falsy
+      const hasQuantity = newQty && newQty !== "0" && newQty !== 0;
+      const itemCountElement = document.getElementById('itemCountDisplay'); // Obtener el elemento del contador
+
+      // Para la pestaña de pedido, también actualizar la pestaña de orden
+      if (tab === 'pedido') {
+        // Actualizar en la pestaña de pedido
+        let containerSelector = '#pedidoList';
+        let container = document.querySelector(containerSelector);
+        updateItemUI(container, productName, newQty, hasQuantity, tab);
+        
+        // También actualizar en la pestaña orden, si tiene cantidad (o remover si ya no tiene)
+        containerSelector = '#ordenList';
+        container = document.querySelector(containerSelector);
+        
+        if (hasQuantity) {
+          // Si tiene cantidad, actualizar elemento existente o renderizar toda la pestaña si no existe
+          const item = findItemInContainer(container, productName);
+          if (item) {
+            updateItemUI(container, productName, newQty, hasQuantity, 'pedido');
+          } else {
+            // Si no encontramos el item pero debería tener cantidad, mejor renderizar toda la pestaña
+            renderOrdenTab();
+          }
+        } else {
+          // Si ya no tiene cantidad, debe eliminarse de la pestaña orden
+          const item = findItemInContainer(container, productName);
+          if (item) {
+            container.removeChild(item);
+            
+            // Si era un ítem con crédito, también buscar y remover el ítem de crédito
+            const items = getAllItems();
+            if (items[productName] && items[productName].creditQty && 
+                items[productName].creditQty !== 0 && items[productName].creditQty !== '0') {
+              // Hay un ítem de crédito, buscar por su etiqueta especial
+              const creditItems = Array.from(container.querySelectorAll('.item'));
+              for (let i = 0; i < creditItems.length; i++) {
+                const creditLabel = creditItems[i].querySelector('.quantity-row span');
+                if (creditLabel && creditLabel.textContent.includes('CRÉDITO') && 
+                    creditItems[i].querySelector('.product-name').textContent === productName) {
+                  container.removeChild(creditItems[i]);
+                  break;
+                }
+              }
+            }
+            
+            // Si ya no hay elementos, mostrar mensaje
+            if (container.childElementCount === 0) {
+              const emptyMessage = document.createElement('div');
+              emptyMessage.style.textAlign = 'center';
+              emptyMessage.style.padding = '50px 20px';
+              emptyMessage.style.color = '#666';
+              emptyMessage.style.width = '100%';
+              emptyMessage.innerHTML = '<span class="material-icons" style="font-size:48px; margin-bottom:10px;">shopping_cart</span><br>No hay productos en tu orden.<br>Añade cantidades en la pestaña "Pedido".';
+              container.appendChild(emptyMessage);
+            }
+          }
+        }
+      } else {
+        // Para la pestaña de inventario, comportamiento normal
+        const containerSelector = '#inventarioList';
+        const container = document.querySelector(containerSelector);
+        updateItemUI(container, productName, newQty, hasQuantity, tab);
+      }
+
+      // Forzar actualización del contador si estamos en la pestaña Pedido y se modificó una cantidad allí
+      if (tab === 'pedido' && itemCountElement && document.getElementById('pedidoTab').style.display !== 'none') {
+        const items = getAllItems();
+        let entries = Object.entries(items);
+
+        // Aplicar filtros actuales (búsqueda y compañía) para el conteo
+        if (searchTerm) {
+          entries = entries.filter(([key]) => key.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+        if (currentCompanyFilter) {
+          entries = entries.filter(([, data]) => data && data.company === currentCompanyFilter);
+        }
+
+        const pedidoConCantidad = entries.filter(([, data]) => data && data.pedidoQty && parseQuantity(data.pedidoQty) > 0);
+        
+        if (pedidoConCantidad.length === 0) {
+          itemCountElement.textContent = "Nada en pedido";
+        } else if (pedidoConCantidad.length === 1) {
+          itemCountElement.textContent = `1 producto en pedido`;
+        } else {
+          itemCountElement.textContent = `${pedidoConCantidad.length} productos en pedido`;
+        }
+      }
+    }
+    
+    // Función auxiliar para actualizar un elemento específico en un contenedor
+    function findItemInContainer(container, productName) {
+      if (!container) return null;
+      
+      // Buscar el elemento correspondiente al producto
+      const items = container.querySelectorAll('.item');
+      for (let i = 0; i < items.length; i++) {
+        const itemNameElement = items[i].querySelector('.product-name');
+        if (itemNameElement && itemNameElement.textContent === productName) {
+          // Skip credit items
+          const isCreditItem = items[i].querySelector('.quantity-row span')?.textContent.includes('CRÉDITO');
+          if (!isCreditItem) {
+            return items[i];
+          }
+        }
+      }
+      return null;
+    }
+    
+    // Función auxiliar para actualizar la UI de un item
+    function updateItemUI(container, productName, newQty, hasQuantity, tab) {
+      if (!container) return;
+      
+      const productItem = findItemInContainer(container, productName);
+      if (!productItem) return;
+      
+      // Update the input value - si la cantidad es 0, mostrar un campo vacío
+      const input = productItem.querySelector('input[type="text"]'); // Más específico
+      if (input) input.value = hasQuantity ? formatQuantity(parseQuantity(newQty)) : ''; // Usar formatQuantity
+      
+      // Update the highlight class - solo destacar si realmente hay una cantidad
+      if (hasQuantity) {
+        productItem.classList.add('highlight');
+      } else {
+        productItem.classList.remove('highlight');
+      }
+      
+      // Handle the decrement button visibility
+      const inputContainer = productItem.querySelector('.quantity-input-container');
+      if (!inputContainer) return;
+      
+      let existingDecrementBtn = inputContainer.querySelector('.decrease-qty-btn');
+      
+      if (!hasQuantity && existingDecrementBtn) {
+        // Si la cantidad es 0 y el botón existe, removerlo.
+        inputContainer.removeChild(existingDecrementBtn);
+      } else if (hasQuantity && !existingDecrementBtn) {
+        // Si hay cantidad y el botón no existe, crearlo y añadirlo.
+        const newDecrementBtn = createQuantityButton('decrease', productName, tab);
+        // El input es el segundo hijo usualmente (después de '-' si existe, o primero si no).
+        // El botón '+' es el último.
+        const plusButton = inputContainer.querySelector('.increase-qty-btn');
+        if (plusButton) {
+            inputContainer.insertBefore(newDecrementBtn, plusButton.previousSibling); // Antes del input
+        } else { // Si no hay botón plus (no debería pasar), añadir al inicio.
+            inputContainer.insertBefore(newDecrementBtn, inputContainer.firstChild);
+        }
+      }
+      // Si hasQuantity y existingDecrementBtn existen, no hacer nada (ya está bien).
+    }
+
+    // --- INICIO FUNCIONES MODAL ENVIAR MENSAJE ---
+    function openSendMessageModal() {
+      if (!currentCompanyFilter) {
+        alert("Por favor, filtra por una compañía para enviar la orden.");
+        return;
+      }
+
+      const companies = getCompanies();
+      const company = companies.find(c => c.name === currentCompanyFilter);
+
+      if (!company || !company.phone) {
+        alert("Esta compañía no tiene un número de teléfono configurado en Ajustes o no se encontró la compañía.");
+        return;
+      }
+
+      const items = getAllItems();
+      let orderText = ""; // Esta variable ahora es principalmente para la lógica de productCount
+      let productCount = 0;
+
+      // Recopilar productos de la pestaña Orden (los que están visibles y tienen cantidad)
+      const ordenListContainer = document.getElementById('ordenList');
+      const displayedItems = ordenListContainer.querySelectorAll('.item');
+
+      displayedItems.forEach(itemElement => {
+        const productNameElement = itemElement.querySelector('.product-name');
+        const quantityInputElement = itemElement.querySelector('.quantity-row input');
+        // const presentationLabelElement = itemElement.querySelector('.quantity-row > span:not([class])'); 
+
+        if (productNameElement && quantityInputElement) {
+          const productName = productNameElement.textContent;
+          let quantity = quantityInputElement.value;
+                    
+          if (quantity && parseFloat(quantity) > 0) {
+            // Ya no necesitamos construir orderText aquí, solo contar productos.
+            productCount++;
+          }
+        }
+      });
+
+      if (productCount === 0) {
+        alert("No hay productos con cantidad en la orden actual para esta compañía.");
+        return;
+      }
+
+      // El mensaje de texto será solo el mensaje predeterminado de la compañía o un placeholder
+      let textMessage = company.defaultMessage ? company.defaultMessage : "Hola, te adjunto la orden de productos:"; // Ajustado el placeholder
+      
+      // Generar el PDF para adjuntar
+      try {
+        const doc = createPDFDocument(); // Reutilizamos la función existente
+        const pdfBlob = doc.output('blob');
+        const companyNameForFile = currentCompanyFilter.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const dateSuffix = new Date().toISOString().split('T')[0];
+        currentOrderPDFFile = new File([pdfBlob], `orden_${companyNameForFile}_${dateSuffix}.pdf`, { type: "application/pdf" });
+      } catch (e) {
+        console.error("Error al generar PDF para compartir:", e);
+        currentOrderPDFFile = null; // Asegurarse de que esté nulo si falla
+        alert("Hubo un error al generar el PDF para adjuntar. Solo se enviará el mensaje de texto.");
+      }
+
+      document.getElementById('sendMessageText').value = textMessage;
+      document.getElementById('sendOrderToInfo').textContent = `Se enviará a: ${company.name} (${company.phone})`;
+      document.getElementById('sendMessageModal').classList.add('show');
+      document.body.classList.add('body-modal-open'); // Bloquear scroll
+    }
+
+    function closeSendMessageModal() {
+      document.getElementById('sendMessageModal').classList.remove('show');
+      document.body.classList.remove('body-modal-open'); // Desbloquear scroll
+    }
+
+    function sendViaSMS() {
+      const phoneNumber = currentCompanyFilter ? getCompanies().find(c => c.name === currentCompanyFilter)?.phone : null;
+      const message = document.getElementById('sendMessageText').value;
+      if (!phoneNumber) {
+        alert("No se pudo obtener el número de teléfono de la compañía.");
+        return;
+      }
+
+      if (navigator.share && currentOrderPDFFile) {
+        navigator.share({
+          title: 'Orden de Compra',
+          text: message,
+          files: [currentOrderPDFFile]
+        })
+        .then(() => console.log('Contenido compartido exitosamente (SMS)'))
+        .catch((error) => {
+          console.error('Error al compartir (SMS):', error);
+          alert('No se pudo compartir automáticamente. Intenta descargar el PDF y enviarlo manualmente.\nError: ' + error.message);
+          // Fallback si navigator.share falla o es cancelado por el usuario con archivo adjunto
+          // Podríamos intentar compartir solo texto si el error indica que los archivos no son soportados por el target
+          // o simplemente mostrar el mensaje de error como ya se hace.
+        });
+      } else if (navigator.share) { // Puede compartir texto pero no se generó el PDF
+         navigator.share({ title: 'Orden de Compra', text: message })
+        .then(() => console.log('Mensaje de texto compartido exitosamente (SMS)'))
+        .catch((error) => console.error('Error al compartir texto (SMS):', error));
+      } else {
+        alert("La función de compartir no está disponible en este navegador. Copia el mensaje e intenta enviar el PDF manualmente si lo necesitas.");
+        // Fallback para navegadores sin navigator.share: (esto ya no es necesario si nos basamos en navigator.share)
+        // window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+      }
+      closeSendMessageModal();
+    }
+
+    function sendViaWhatsApp() {
+      const phoneNumber = currentCompanyFilter ? getCompanies().find(c => c.name === currentCompanyFilter)?.phone : null;
+      const message = document.getElementById('sendMessageText').value;
+      if (!phoneNumber) {
+        alert("No se pudo obtener el número de teléfono de la compañía.");
+        return;
+      }
+      // Limpiar el número de teléfono para WhatsApp (quitar +, espacios, guiones)
+      const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+
+      if (navigator.share && currentOrderPDFFile) {
+        navigator.share({
+          title: 'Orden de Compra',
+          text: message,
+          files: [currentOrderPDFFile]
+        })
+        .then(() => console.log('Contenido compartido exitosamente (WhatsApp)'))
+        .catch((error) => {
+          console.error('Error al compartir (WhatsApp):', error);
+          alert('No se pudo compartir automáticamente. Intenta descargar el PDF y enviarlo manualmente.\nError: ' + error.message);
+           // Fallback si navigator.share falla o es cancelado por el usuario con archivo adjunto
+        });
+      } else if (navigator.share) { // Puede compartir texto pero no se generó el PDF
+         navigator.share({ title: 'Orden de Compra', text: message })
+        .then(() => console.log('Mensaje de texto compartido exitosamente (WhatsApp)'))
+        .catch((error) => {
+           console.error('Error al compartir texto (WhatsApp):', error);
+           // Si falla el share de solo texto, intentar el método tradicional de WhatsApp
+           window.open(`https://wa.me/${cleanPhoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+        });
+      } else {
+        alert("La función de compartir no está disponible en este navegador. Intentando abrir WhatsApp directamente (solo mensaje).");
+        window.open(`https://wa.me/${cleanPhoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+      }
+      closeSendMessageModal();
+    }
+    // --- FIN FUNCIONES MODAL ENVIAR MENSAJE ---
+
+    /* ===== FUNCIONES MODAL CRÉDITOS ===== */
+    function openCreditModal(productName) {
+      // currentEdit = productName; // Ya no usamos currentEdit aquí
+      const creditModalElement = document.getElementById('creditModal');
+      if (!creditModalElement) {
+        console.error("Modal de crédito no encontrado"); 
+        return;
+      }
+      creditModalElement.dataset.editingProduct = productName; // Guardar el nombre del producto en el modal
+
+      const items = getAllItems();
+      const product = items[productName];
+
+      if (!product) {
+        alert("Producto no encontrado para agregar crédito.");
+        closeCreditModal(); // Cierra el modal si el producto no existe
+        return;
+      }
+
+      const creditPresentationSelect = document.getElementById('creditPresentation');
+      fillSelectOptions('creditPresentation', getPresentations(), product.creditPresentation || product.presentation);
+
+      // Usar formatQuantity aquí podría ser útil si quieres mostrar "1/2" en vez de 0.5 si ese es el valor guardado.
+      // Pero para la edición, usualmente se muestra el valor tal cual o vacío para 0.
+      document.getElementById('creditQty').value = (product.creditQty && product.creditQty !== 0 && product.creditQty !== '0') ? String(product.creditQty) : '';
+      
+      creditModalElement.classList.add('show');
+      document.body.classList.add('body-modal-open'); // Bloquear scroll
+    }
 
     function saveCreditInfo() {
       const creditModalElement = document.getElementById('creditModal');
@@ -5627,7 +5253,9 @@
       document.body.classList.remove('body-modal-open'); // Desbloquear scroll
       delete creditModalElement.dataset.editingProduct; // Limpiar el atributo data
     }
+    // --- FIN FUNCIONES MODAL CRÉDITOS ---
 
+    // --- INICIO FUNCIÓN REMOVER CRÉDITO ---
     function removeCredit(productName) {
       const items = getAllItems();
       if (items[productName]) {
@@ -5639,6 +5267,7 @@
         console.warn("Producto no encontrado al intentar remover crédito:", productName);
       }
     }
+    // --- FIN FUNCIÓN REMOVER CRÉDITO ---
 
     function clearSearch() {
       document.getElementById('searchInput').value = '';
@@ -5647,58 +5276,10 @@
       updateSearch('');
     }
 
-    function toggleFullScreen() {
-      // ... existing code ...
-    }
-
-    // ===== FUNCIONES RESTAURADAS =====
-    // Función para ordenar entradas según el modo seleccionado
-    function sortEntriesByCurrentMode(entries) {
-      const sortModeToUse = sortMode; // Usar la variable global sortMode
-
-      if (sortModeToUse === 'byCustomOrder') {
-        return entries.sort((a, b) => {
-          const orderA = a[1]?.customSortOrder ?? Number.MAX_SAFE_INTEGER;
-          const orderB = b[1]?.customSortOrder ?? Number.MAX_SAFE_INTEGER;
-          if (orderA === orderB) {
-            return a[0].localeCompare(b[0]);
-          }
-          return orderA - orderB;
-        });
-      }
-      if (sortModeToUse === 'byNumberAsc') {
-        return entries.sort((a, b) => {
-          const numA = parseInt(a[1]?.numero || "0", 10);
-          const numB = parseInt(b[1]?.numero || "0", 10);
-          if (numA === numB) {
-            return a[0].localeCompare(b[0]);
-          }
-          return numA - numB;
-        });
-      }
-      else if (sortModeToUse === 'byNumberDesc') {
-        return entries.sort((a, b) => {
-          const numA = parseInt(a[1]?.numero || "0", 10);
-          const numB = parseInt(b[1]?.numero || "0", 10);
-          if (numA === numB) {
-            return a[0].localeCompare(b[0]);
-          }
-          return numB - numA;
-        });
-      }
-      else if (sortModeToUse === 'byNameDesc') {
-        return entries.sort((a, b) => b[0].localeCompare(a[0]));
-      }
-      else { // byNameAsc (default)
-        return entries.sort((a, b) => a[0].localeCompare(b[0]));
-      }
-    }
-
-    // Funciones para migración y orden personalizado
+    // *** INICIO NUEVAS FUNCIONES PARA MIGRACIÓN Y ORDEN PERSONALIZADO ***
     function migrateOrderSystem() {
-      const ORDER_SYSTEM_MIGRATED_KEY = 'orderSystemMigrated_v1';
       if (localStorage.getItem(ORDER_SYSTEM_MIGRATED_KEY)) {
-        // console.log("El sistema de orden personalizado ya ha sido migrado."); // Comentado para reducir logs
+        console.log("El sistema de orden personalizado ya ha sido migrado.");
         return;
       }
 
@@ -5706,24 +5287,42 @@
       const items = getAllItems();
       let entries = Object.entries(items);
 
+      // Determinar el orden actual basado en el sortMode guardado (o un default)
+      // Usamos el sortMode que se carga en restoreFiltersAndState() o el default 'byNameAsc'
+      // La función sortEntriesByCurrentMode usará la variable global 'sortMode'
       const currentEffectiveSortMode = localStorage.getItem('sortMode') || 'byNameAsc';
       
+      // Clonamos las entries para no modificar las originales si sortEntriesByCurrentMode lo hace in-place
       let sortedEntriesForMigration = [...entries];
 
+      // Necesitamos una versión de sortEntriesByCurrentMode que acepte el modo como parámetro
+      // para no depender del `sortMode` global que podría no estar inicializado aún de la forma que queremos aquí.
+      // Por ahora, asumiremos que el `sortMode` global ya está establecido por `restoreFiltersAndState`.
+      // Si no, tendríamos que replicar la lógica de sortEntriesByCurrentMode aquí.
+      // Para simplificar, vamos a usar el `sortMode` global que ya debería estar cargado.
+      // Nota: La función sortEntriesByCurrentMode ahora sí toma `entries` como argumento y lo devuelve ordenado.
+
       if (currentEffectiveSortMode === 'byCustomOrder') {
+         // Si el modo por defecto ya era customOrder y estamos migrando, algo es raro.
+         // Mejor usar un orden base como nombre para la migración inicial.
          console.warn("Migrando con customOrder como base no es ideal, usando orden por nombre A-Z.");
-         sortedEntriesForMigration.sort((a, b) => a[0].localeCompare(b[0]));
+         sortedEntriesForMigration.sort((a, b) => a[0].localeCompare(b[0])); // Nombre A-Z
       } else {
+        // Usamos la función global de sort, que usa el 'sortMode' global.
+        // Esto es un poco indirecto. Sería más robusto si sortEntriesByCurrentMode tomara el modo como arg.
+        // Temporalmente, para la migración, forzaremos el sortMode global si es necesario.
+        // Creamos una copia para no modificar el sortMode global permanentemente aquí
         const tempSortModeForMigration = sortMode;
         sortMode = currentEffectiveSortMode;
-        sortedEntriesForMigration = sortEntriesByCurrentMode(sortedEntriesForMigration);
-        sortMode = tempSortModeForMigration;
+        sortedEntriesForMigration = sortEntriesByCurrentMode(sortedEntriesForMigration); // sortEntriesByCurrentMode devuelve una nueva lista ordenada
+        sortMode = tempSortModeForMigration; // Restaurar el sortMode original
       }
+
 
       let changesMade = false;
       sortedEntriesForMigration.forEach(([name, data], index) => {
         if (items[name] && items[name].customSortOrder === undefined) {
-          items[name].customSortOrder = (index + 1) * 1000;
+          items[name].customSortOrder = (index + 1) * 1000; // Empezar desde 1000, 2000, etc.
           changesMade = true;
         }
       });
@@ -5732,195 +5331,276 @@
         setAllItems(items);
         console.log("Migración completada. Se asignaron órdenes personalizadas iniciales.");
       } else {
-        // console.log("No se necesitaron cambios en la migración o los ítems ya tenían customSortOrder."); // Comentado
+        console.log("No se necesitaron cambios en la migración o los ítems ya tenían customSortOrder.");
       }
       localStorage.setItem(ORDER_SYSTEM_MIGRATED_KEY, 'true');
     }
+    // *** FIN NUEVAS FUNCIONES PARA MIGRACIÓN Y ORDEN PERSONALIZADO ***
 
-    // Función para limpiar texto de código visible en la interfaz
-    function cleanupCodeText() {
-      const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT,
-        null,
-        false
-      );
+    // *** INICIO NUEVA FUNCIÓN PARA LLENAR SELECT DE ORDEN PERSONALIZADO ***
+    function fillCustomSortPositionSelect(editingProductName, currentProductSortOrder) {
+      const select = document.getElementById('editCustomSortPosition');
+      select.innerHTML = ''; // Limpiar opciones previas
 
-      const nodesToRemove = [];
-      let node;
-
-      while(node = walker.nextNode()) {
-        if (node.nodeValue && (
-            node.nodeValue.includes('logoFileInput.value') ||
-            node.nodeValue.includes('companies.push') ||
-            node.nodeValue.includes('localStorage.setItem(COMPANIES_KEY') ||
-            node.nodeValue.includes('renderSettingsLists')
-           )) {
-          nodesToRemove.push(node);
-        }
-      }
-
-      nodesToRemove.forEach(node => {
-        if (node.parentNode) {
-          node.parentNode.removeChild(node);
-        }
-      });
-
-      // console.log("Cleanup ejecutado, programando siguiente en 2s."); // Comentado
-      setTimeout(cleanupCodeText, 2000);
-    }
-    // ===== FIN FUNCIONES RESTAURADAS =====
-
-    // Función para crear botones de incremento/decremento de cantidad
-    function createQuantityButton(type, productName, tabType) {
-      const btn = document.createElement('button');
-      btn.type = "button";
-      btn.className = 'quantity-btn';
-      
-      // Contenido del botón según el tipo
-      if (type === 'decrease') {
-        btn.innerHTML = '-';
-      } else {
-        btn.innerHTML = '+';
-      }
-      
-      // Agregar datos y eventos
-      btn.setAttribute('data-product', productName);
-      btn.setAttribute('data-action', type);
-      btn.setAttribute('data-tab', tabType);
-      
-      btn.onclick = function(event) {
-        event.stopPropagation(); // Evitar que se propague a otros listeners
-        
-        const productName = this.getAttribute('data-product');
-        const action = this.getAttribute('data-action');
-        const tabType = this.getAttribute('data-tab');
-        
       const items = getAllItems();
-        if (!items[productName]) return false;
-        
-        // Determinar qué propiedad modificar según la pestaña actual
-        let qtyProperty = '';
-        if (tabType === 'pedido') qtyProperty = 'pedidoQty';
-        else if (tabType === 'inventario') qtyProperty = 'stock';
-        else return false; // No hacer nada en otra pestaña
-        
-        // Obtener valor actual (o 0 si no existe)
-        const currentValue = items[productName][qtyProperty] || 0;
-        
-        // Convertir a número para operar
-        const currentNum = parseQuantity(currentValue);
-        
-        // Calcular nuevo valor según la acción
-        let newValue = currentNum;
-        if (action === 'increase') {
-          // Para incremento, sumar 1 o 0.5 si el valor actual es decimal
-          newValue = currentNum + (Number.isInteger(currentNum) ? 1 : 0.5);
-          } else {
-          // Para decremento
-          if (currentNum > 0) {
-            // Si es menor o igual a 1, restar 0.5, sino restar 1
-            newValue = currentNum <= 1 ? currentNum - 0.5 : currentNum - 1;
-          }
-          // Si el nuevo valor es muy cercano a cero, establecerlo a cero
-          if (newValue < 0.1) newValue = 0;
-        }
-        
-        // Guardar el nuevo valor
-        items[productName][qtyProperty] = formatQuantity(newValue);
-        setAllItems(items);
-        
-        // Actualizar la interfaz
-        renderTabs();
-        
-        return false;
-      };
-      
-      return btn;
-    }
-
-    /* ===== NUEVA FUNCIÓN PARA AJUSTAR MARGEN DEL CONTENIDO ===== */
-    function adjustContentMargin() {
-      const header = document.querySelector('.header');
-      const contents = document.querySelectorAll('.content');
-      if (header && contents.length > 0) {
-        const headerHeight = header.offsetHeight;
-        contents.forEach(content => {
-          content.style.marginTop = headerHeight + 'px';
-        });
-        // console.log('Margen superior del contenido ajustado a: ' + headerHeight + 'px');
-      }
-    }
-
-    // NUEVA FUNCIÓN updateInfoBadge
-    function updateInfoBadge() {
-      const infoBadgeCount = document.getElementById('infoBadgeCount');
-      const infoBadgeIcon = document.getElementById('infoBadgeIcon'); // Para mostrar/ocultar si es necesario
-
-      if (!infoBadgeCount || !infoBadgeIcon) {
-        console.warn("Elementos del badge de información no encontrados.");
-        return;
-      }
-
-      const items = getAllItems(); // Asegúrate que esto obtiene los items de la colección actual
-      let itemCount = 0;
-
-      Object.values(items).forEach(item => {
-        if (item && item.pedidoQty && parseQuantity(item.pedidoQty) > 0) {
-          itemCount++;
-        }
+      const productKeys = Object.keys(items).sort((a, b) => {
+        const orderA = items[a]?.customSortOrder ?? Number.MAX_SAFE_INTEGER;
+        const orderB = items[b]?.customSortOrder ?? Number.MAX_SAFE_INTEGER;
+        if (orderA === orderB) return a.localeCompare(b);
+        return orderA - orderB;
       });
 
-      infoBadgeCount.textContent = itemCount;
+      let foundCurrentProductInSortedList = false;
 
-      // Opcional: Mostrar u ocultar el badge si el conteo es 0
-      if (itemCount > 0) {
-        infoBadgeCount.style.display = 'inline-block'; // O 'flex' dependiendo de tu CSS para centrar
+      // Opción: Mantener posición actual (solo si se está editando)
+      if (editingProductName) {
+        const optCurrent = document.createElement('option');
+        optCurrent.value = `current_${currentProductSortOrder}`; // Guardar el orden actual para referencia
+        optCurrent.textContent = 'Mantener posición actual';
+        select.appendChild(optCurrent);
+      }
+
+      // Opción: Al principio
+      const optStart = document.createElement('option');
+      optStart.value = 'at_start';
+      optStart.textContent = 'Al principio de la lista';
+      select.appendChild(optStart);
+
+      // Opciones: Después de [Producto X]
+      productKeys.forEach(key => {
+        if (key === editingProductName) {
+          foundCurrentProductInSortedList = true;
+          return; // No ofrecer "después de sí mismo"
+        }
+        const optAfter = document.createElement('option');
+        optAfter.value = `after_${key}`;
+        optAfter.textContent = `Después de: ${items[key].numero ? '['+items[key].numero+']' : ''} ${key}`;
+        select.appendChild(optAfter);
+      });
+
+      // Opción: Al final (por defecto para nuevos productos, o si se edita y no se selecciona otra)
+      const optEnd = document.createElement('option');
+      optEnd.value = 'at_end';
+      optEnd.textContent = 'Al final de la lista';
+      select.appendChild(optEnd);
+
+      // Seleccionar la opción por defecto
+      if (editingProductName) {
+        select.value = `current_${currentProductSortOrder}`; // Default a mantener posición
       } else {
-        infoBadgeCount.style.display = 'none';
+        select.value = 'at_end'; // Default al final para nuevos productos
       }
     }
-    // FIN NUEVA FUNCIÓN updateInfoBadge
-    
-    // Script para Service Worker (Actualizaciones PWA)
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js").then(reg => {
-        reg.onupdatefound = () => {
-          const nuevoSW = reg.installing;
-          nuevoSW.onstatechange = () => {
-            if (nuevoSW.state === "installed") {
-              if (navigator.serviceWorker.controller) {
-                if (confirm("Hay una nueva versión disponible. ¿Actualizar ahora?")) {
-                  window.location.reload();
-                }
-              }
-            }
-          };
-        };
-      });
+    // *** FIN NUEVA FUNCIÓN PARA LLENAR SELECT DE ORDEN PERSONALIZADO ***
+
+    // === ACTUALIZAR BADGE Y MODAL ===
+    function updateInfoBadge() {
+      const badge = document.getElementById('infoBadgeCount');
+      const icon = document.getElementById('infoBadgeIcon');
+      const tabPedido = document.getElementById('pedidoTab').style.display !== 'none';
+      const tabOrden = document.getElementById('ordenTab').style.display !== 'none';
+      const tabInventario = document.getElementById('inventarioTab').style.display !== 'none';
+      let count = 0;
+      let iconName = 'shopping_cart';
+      let infoText = '';
+      // Usar el mismo texto y conteo que el contador actual
+      const itemCountElement = document.getElementById('itemCountDisplay');
+      if (itemCountElement) {
+        // El texto ya se actualiza en renderTabs, solo tomar el número
+        infoText = itemCountElement.textContent;
+        // Extraer número del texto
+        const match = infoText.match(/(\d+)/);
+        if (match) count = parseInt(match[1], 10);
+      }
+      // Cambiar icono según pestaña
+      if (tabPedido || tabOrden) iconName = 'shopping_cart';
+      if (tabInventario) iconName = 'inventory_2';
+      icon.textContent = iconName;
+      badge.textContent = count;
     }
+
+    // Llamar updateInfoBadge en cada renderTabs y cuando cambie el filtro
+    const _originalRenderTabs = renderTabs;
+    renderTabs = function() {
+      _originalRenderTabs();
+      updateInfoBadge();
+    }
+    // También actualizar al cambiar filtros
+    const _originalUpdateSearch = updateSearch;
+    updateSearch = function(val) {
+      _originalUpdateSearch(val);
+      updateInfoBadge();
+    }
+    // Y al seleccionar compañía
+    const _originalSelectCompany = selectCompany;
+    selectCompany = function(name) {
+      _originalSelectCompany(name);
+      updateInfoBadge();
+    }
+
+    // === MODAL INFO BADGE ===
+    function openInfoBadgeModal(event) {
+      event.stopPropagation();
+      const modal = document.getElementById('infoBadgeModal');
+      const iconEl = document.getElementById('infoBadgeModalIcon');
+      const textEl = document.getElementById('infoBadgeModalText');
+      const tabPedido = document.getElementById('pedidoTab').style.display !== 'none';
+      const tabOrden = document.getElementById('ordenTab').style.display !== 'none';
+      const tabInventario = document.getElementById('inventarioTab').style.display !== 'none';
+      
+      let iconName = 'shopping_cart';
+      if (tabPedido || tabOrden) iconName = 'shopping_cart';
+      if (tabInventario) iconName = 'inventory_2';
+      
+      iconEl.textContent = iconName;
+      
+      // Obtener el texto del contador de itemCountDisplay y mostrarlo en el modal
+      const itemCountElement = document.getElementById('itemCountDisplay');
+      textEl.textContent = itemCountElement ? itemCountElement.textContent : 'Información no disponible';
+      
+      modal.classList.add('show');
+      document.body.classList.add('body-modal-open');
+    }
+    function closeInfoBadgeModal() {
+      document.getElementById('infoBadgeModal').classList.remove('show');
+      document.body.classList.remove('body-modal-open');
+    }
+    // Cerrar modal al hacer click fuera
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('infoBadgeModal');
+      if (modal && modal.classList.contains('show')) {
+        const content = modal.querySelector('.modal-content');
+        if (content && !content.contains(e.target)) { 
+          closeInfoBadgeModal();
+        }
+      }
+    });
+    // Inicializar badge al cargar
+    window.addEventListener('DOMContentLoaded', updateInfoBadge);
+
+    function updateItemCount() {
+      const itemCountElement = document.getElementById('itemCountDisplay');
+      if (!itemCountElement) return;
+
+      const activeTabElement = document.querySelector('.tab.active');
+      if (!activeTabElement) return;
+      
+      const activeTabName = activeTabElement.textContent.toLowerCase();
+      const items = getAllItems();
+      let entries = Object.entries(items);
+
+      // Aplicar filtros para el conteo (búsqueda y compañía)
+      if (searchTerm) {
+          const lowerSearchTerm = searchTerm.toLowerCase();
+          entries = entries.filter(([key, data]) => {
+            const lowerKey = key.toLowerCase();
+            const productTags = data.tags || [];
+            return lowerKey.includes(lowerSearchTerm) || 
+                   productTags.some(tag => tag.toLowerCase().includes(lowerSearchTerm));
+          });
+      }
+      if (currentCompanyFilter) {
+          entries = entries.filter(([, data]) => data && data.company === currentCompanyFilter);
+      }
+
+      if (activeTabName === 'pedido') {
+          const pedidoConCantidad = entries.filter(([, data]) => data && data.pedidoQty && parseQuantity(data.pedidoQty) > 0);
+          if (pedidoConCantidad.length === 0) {
+              itemCountElement.textContent = "Nada en pedido";
+          } else if (pedidoConCantidad.length === 1) {
+              itemCountElement.textContent = `1 producto en pedido`;
+          } else {
+              itemCountElement.textContent = `${pedidoConCantidad.length} productos en pedido`;
+          }
+      } else if (activeTabName === 'orden') {
+          let distinctItemCountInOrder = 0;
+          let totalQuantitySumInOrder = 0;
+          const itemsEnOrden = entries.filter(([, data]) => 
+              data && (
+                  (data.pedidoQty && parseQuantity(data.pedidoQty) > 0) ||
+                  (data.creditQty && parseQuantity(data.creditQty) > 0)
+              )
+          );
+
+          if (itemsEnOrden.length > 0) {
+              distinctItemCountInOrder = itemsEnOrden.length; // Cada entrada filtrada es un ítem distinto en la orden
+              itemsEnOrden.forEach(([, data]) => {
+                  totalQuantitySumInOrder += parseQuantity(data.pedidoQty || 0);
+                  totalQuantitySumInOrder += parseQuantity(data.creditQty || 0);
+              });
+          }
+
+          if (distinctItemCountInOrder === 0) {
+              itemCountElement.textContent = "Orden vacía";
+          } else {
+              let countText = `Orden: ${distinctItemCountInOrder} ítem(s)`;
+              if (totalQuantitySumInOrder > 0) {
+                  countText += ` / Total: ${formatQuantity(totalQuantitySumInOrder)} unidades`;
+              }
+              itemCountElement.textContent = countText;
+          }
+
+      } else if (activeTabName === 'inventario') {
+          if (entries.length === 0) {
+              itemCountElement.textContent = "Inventario vacío";
+          } else if (entries.length === 1) {
+              itemCountElement.textContent = `1 producto en inventario`;
+          } else {
+              itemCountElement.textContent = `${entries.length} productos en inventario`;
+          }
+      }
+      updateInfoBadge(); // Asegurarse que el badge también se actualice
+    }
+
+    // Event listener para cerrar el popup al hacer clic en cualquier parte
+    document.addEventListener('click', function(event) {
+      const target = event.target;
+
+      // 1. Company Popup
+      const companyPopup = document.getElementById('companyPopup');
+      const companyPopupButton = document.querySelector('.store-icon-btn'); 
+      
+      if (companyPopup && companyPopup.classList.contains('show')) {
+        // Cerrar si el clic NO es en el botón que lo abre Y NO es dentro del popup
+        if (companyPopupButton && !companyPopupButton.contains(target) && !companyPopup.contains(target)) {
+          companyPopup.classList.remove('show');
+        }
+      }
+
+      // 2. View Options Popup
+      const viewOptionsPopup = document.getElementById('viewOptions');
+      // El botón de opciones de vista ahora es el segundo .header-icon-btn en .header-icon-group-right
+      const viewOptionsButton = document.querySelector('.header-icon-group-right .header-icon-btn:nth-child(2)'); 
+
+      if (viewOptionsPopup && viewOptionsPopup.style.display === 'flex') {
+        // Cerrar si el clic NO es en el botón que lo abre Y NO es dentro del popup
+        if (viewOptionsButton && !viewOptionsButton.contains(target) && !viewOptionsPopup.contains(target)) {
+          toggleViewOptions(); // Esta función maneja el cierre/apertura
+        }
+      }
+
+      // 3. Info Badge Modal (Carrito)
+      const infoBadgeModal = document.getElementById('infoBadgeModal');
+      const infoBadgeButton = document.getElementById('infoBadgeBtn'); // Botón que abre este modal
+
+      if (infoBadgeModal && infoBadgeModal.classList.contains('show')) {
+        const modalContent = infoBadgeModal.querySelector('.info-badge-modal-content');
+        // Cerrar si el clic es en el backdrop (directamente en infoBadgeModal pero no en su contenido) 
+        // O si es fuera del contenido y NO en el botón que lo abre.
+        if (target === infoBadgeModal || 
+            (modalContent && !modalContent.contains(target) && infoBadgeButton && !infoBadgeButton.contains(target)) ) {
+          closeInfoBadgeModal();
+        }
+      }
+    });
+    // --- FIN NUEVAS FUNCIONES ---
   </script>
   <script>
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js").then(reg => {
-      console.log("SW registrado:", reg.scope); // Mantenemos el log existente
-      reg.onupdatefound = () => {
-        const nuevoSW = reg.installing;
-        nuevoSW.onstatechange = () => {
-          if (nuevoSW.state === "installed") {
-            if (navigator.serviceWorker.controller) {
-              // Mostrar aviso para actualizar
-              if (confirm("Hay una nueva versión disponible. ¿Actualizar ahora?")) {
-                window.location.reload();
-              }
-            }
-          }
-        };
-      };
-    }).catch(error => {
-      console.error("Error en el registro del SW:", error); // Mantenemos el catch existente
-    });
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(r => console.log("SW registrado:", r.scope))
+      .catch(console.error);
   }
-  </script>
+</script>
 </body>
 </html>
