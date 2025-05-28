@@ -1683,6 +1683,9 @@
     <button onclick="triggerImport()" title="Importar Inventario">
       <span class="material-icons">file_open</span>
     </button>
+    <button id="btnSetAllInventoryToOne" style="display:none;" onclick="openSetAllInventoryToOneModal()" title="Establecer todo el inventario a 1">
+      <span class="material-icons">filter_1</span>
+    </button>
     <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importInventoryFile(this.files[0])" />
   </div>
 
@@ -1944,6 +1947,18 @@
     </div>
   </div>
 
+  <!-- MODAL CONFIRMAR ESTABLECER INVENTARIO A 1 -->
+  <div id="setAllInventoryToOneModal" class="modal">
+    <div class="modal-content" style="max-width:350px;">
+      <h3>Confirmar Acción</h3>
+      <p>¿Estás seguro de que quieres establecer la cantidad de todos los productos en el inventario actual a 1?</p>
+      <div class="modal-buttons">
+        <button onclick="confirmSetAllInventoryToOne()" class="save-btn">Confirmar</button>
+        <button onclick="closeSetAllInventoryToOneModal()" class="cancel-btn">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL EXPORTAR JSON -->
   <div id="exportModal" class="modal">
     <div class="modal-content" style="max-width:400px;">
@@ -2192,6 +2207,7 @@
       const btnPedido = document.getElementById('btnBorrarPedido');
       const btnInventario = document.getElementById('btnBorrarInventario');
       const btnSendMessage = document.getElementById('btnSendMessage'); // Nuevo botón
+      const btnSetAllInventoryToOne = document.getElementById('btnSetAllInventoryToOne'); // Nuevo botón para inventario a 1
 
       const pedidoTabActive = document.getElementById('pedidoTab').style.display !== 'none';
       const ordenTabActive = document.getElementById('ordenTab').style.display !== 'none';
@@ -2201,18 +2217,22 @@
         btnPedido.style.display = 'inline-block';
         btnInventario.style.display = 'none';
         btnSendMessage.style.display = 'none'; 
+        btnSetAllInventoryToOne.style.display = 'none'; // Ocultar en Pedido
       } else if (ordenTabActive) {
         btnPedido.style.display = 'none';
         btnInventario.style.display = 'none';
         btnSendMessage.style.display = 'inline-block'; 
+        btnSetAllInventoryToOne.style.display = 'none'; // Ocultar en Orden
       } else if (inventarioTabActive) {
         btnPedido.style.display = 'none';
         btnInventario.style.display = 'inline-block';
         btnSendMessage.style.display = 'none'; 
+        btnSetAllInventoryToOne.style.display = 'inline-block'; // Mostrar en Inventario
       } else {
         btnPedido.style.display = 'none';
         btnInventario.style.display = 'none';
         btnSendMessage.style.display = 'none';
+        btnSetAllInventoryToOne.style.display = 'none'; // Ocultar por defecto
       }
     }
 
@@ -4175,208 +4195,351 @@
       document.body.classList.remove('body-modal-open'); // Desbloquear scroll
     }
 
-    function sharePDF() {
+    function generateAndProcessPDF(action) {
       try {
-        const { jsPDF } = window.jspdf;
-        const doc = createPDFDocument();
-        
-        // Compartir el PDF
-        const pdfBlob = doc.output('blob');
-        const activeTabName = document.querySelector('.tab.active').textContent;
-        const title = activeTabName.toUpperCase();
-        const file = new File([pdfBlob], title + ".pdf", { type: "application/pdf" });
-        
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({
-            files: [file],
-            title: title,
-            text: "Aquí está tu " + title
-          }).catch(err => {
-            console.error("Error al compartir:", err);
-            downloadPDF();
-          });
-        } else {
-          downloadPDF();
+        const activeTabElement = document.querySelector('.tab.active');
+        if (!activeTabElement) {
+          alert("No se pudo determinar la pestaña activa.");
+          return;
         }
-        
-        closeShareModal();
-      } catch (e) {
-        console.error("Error al generar PDF:", e);
-        alert("Error al generar el PDF. Descargando en su lugar.");
-        downloadPDF();
-      }
-    }
+        const activeTabName = activeTabElement.textContent.toLowerCase();
+        const { jsPDF } = window.jspdf; // Mover la importación de jsPDF aquí si se usa en agrupado
+        const pageWidth = new jsPDF().internal.pageSize.getWidth();
+        const pageHeight = new jsPDF().internal.pageSize.getHeight();
+        const margin = 15;
 
-    function downloadPDF() {
-      try {
-        const doc = createPDFDocument();
-        const activeTabName = document.querySelector('.tab.active').textContent;
-        doc.save(activeTabName.toUpperCase() + ".pdf");
+        let doc; // Para almacenar el documento PDF final
+        let dataForPdf = [];
+        let pdfTitle = "";
+        let companyToDisplayInHeader = currentCompanyFilter; // Por defecto, si hay filtro global
+        let pdfColumns = ['PRODUCTO', 'CANT.', 'UNIDAD'];
+        let pdfColumnStyles = {
+          0: { cellWidth: pageWidth - margin * 2 - 30 - 25 },
+          1: { cellWidth: 25, halign: 'center' },
+          2: { cellWidth: 30, halign: 'center' }
+        };
+
+        const allItemsObject = getAllItems();
+        let baseEntries = Object.entries(allItemsObject);
+
+        // CASO ESPECIAL: Pedido sin filtro de compañía - PDF Agrupado
+        if (activeTabName === 'pedido' && !currentCompanyFilter) {
+          console.log("[PDF GEN PREP] Iniciando generación de PDF agrupado para Pedido sin filtro.");
+          doc = new jsPDF(); // Crear un nuevo doc para el agrupado
+          let yPos = margin;
+
+          doc.setFontSize(18);
+          doc.setFont('helvetica', 'bold');
+          doc.text("PEDIDO", pageWidth / 2, yPos, { align: 'center' });
+          yPos += 10;
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          const currentDate = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+          doc.text('Fecha: ' + currentDate, pageWidth - margin - doc.getTextWidth('Fecha: ' + currentDate), yPos - 7);
+          yPos += 7;
+
+          const pedidoItems = baseEntries
+              .filter(([, data]) => data && ((data.pedidoQty && parseQuantity(data.pedidoQty) > 0) || (data.creditQty && parseQuantity(data.creditQty) > 0)))
+              .sort((a, b) => (a[1].company || 'ZZZ').localeCompare(b[1].company || 'ZZZ') || a[0].localeCompare(b[0]));
+
+          const groupedByCompany = pedidoItems.reduce((acc, [name, data]) => {
+              const companyName = data.company || 'Sin Compañía Asignada';
+              if (!acc[companyName]) acc[companyName] = [];
+              if (data.pedidoQty && parseQuantity(data.pedidoQty) > 0) {
+                  acc[companyName].push([name, formatQuantity(parseQuantity(data.pedidoQty)), data.presentation || 'caja']);
+              }
+              if (data.creditQty && parseQuantity(data.creditQty) > 0) {
+                  acc[companyName].push([name + " (CRÉDITO)", formatQuantity(parseQuantity(data.creditQty)), data.creditPresentation || data.presentation || 'caja']);
+              }
+              return acc;
+          }, {});
+
+          let totalItemsInOrder = 0;
+          let totalQuantityInOrder = 0;
+
+          Object.keys(groupedByCompany).sort().forEach((companyName, index, array) => {
+              if (yPos > margin + 5) yPos += 7;
+              const companyHeaderHeight = 25; const minSpaceNeeded = companyHeaderHeight + 20;
+              if (yPos + minSpaceNeeded > pageHeight - margin - 15) { doc.addPage(); yPos = margin; }
+
+              yPos = drawCompanyHeaderForGroupedPDF(doc, companyName, yPos, pageWidth, margin);
+              const companyData = groupedByCompany[companyName];
+              companyData.forEach(itemRow => { totalItemsInOrder++; totalQuantityInOrder += parseQuantity(itemRow[1]); });
+
+              doc.autoTable({
+                  startY: yPos, head: [pdfColumns], body: companyData, theme: 'grid',
+                  margin: { left: margin, right: margin }, styles: { fontSize: 9, cellPadding: 1.5, lineColor: [200,200,200], lineWidth: 0.1 },
+                  headStyles: { fillColor: [230, 230, 230], textColor: [50,50,50], fontSize: 10, fontStyle: 'bold', cellPadding: 2 },
+                  columnStyles: pdfColumnStyles,
+                  didParseCell: function(cellData) {
+                      if (cellData.section === 'body' && cellData.row.raw[0].toString().includes("(CRÉDITO)")) {
+                          cellData.cell.styles.textColor = [200, 0, 0]; cellData.cell.styles.fontStyle = 'italic';
+                      }
+                  },
+                  didDrawPage: function (dataHook) {
+                    doc.setFontSize(8); doc.setTextColor(150, 150, 150);
+                    doc.text('Página ' + doc.internal.getNumberOfPages(), pageWidth - margin, pageHeight - 7, { align: 'right' });
+                    doc.text('Generado el ' + new Date().toLocaleString('es-ES', {dateStyle: 'medium', timeStyle: 'short'}), margin, pageHeight - 7);
+                  }
+              });
+              yPos = doc.lastAutoTable.finalY;
+              if (index < array.length - 1) {
+                  yPos += 3;
+                  if (yPos + 5 < pageHeight - margin -15) { doc.setDrawColor(200, 200, 200); doc.line(margin, yPos, pageWidth - margin, yPos); }
+                  yPos += 3;
+              }
+          });
+          
+          const estimatedSummaryHeight = 40;
+          if (yPos + estimatedSummaryHeight > pageHeight - margin - 15) { doc.addPage(); yPos = margin; }
+          yPos += 10;
+          doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+          doc.text("RESUMEN GENERAL DEL PEDIDO:", margin, yPos); yPos += 6;
+          doc.setFont('helvetica', 'normal');
+          doc.text(`Total de Líneas de Producto: ${totalItemsInOrder}`, margin + 5, yPos); yPos += 5;
+          doc.text(`Total de Unidades Pedidas: ${formatQuantity(totalQuantityInOrder)}`, margin + 5, yPos);
+          pdfTitle = "Pedido_Agrupado"; // Para el nombre del archivo
+        } else {
+          // OTROS CASOS: Inventario, Orden, o Pedido CON filtro
+          let entriesToProcess = baseEntries;
+          if (currentCompanyFilter) {
+              entriesToProcess = baseEntries.filter(([, data]) => data && data.company === currentCompanyFilter);
+          }
+
+          if (activeTabName === 'inventario') {
+              pdfTitle = "INVENTARIO";
+              if (currentCompanyFilter) pdfTitle += " - " + currentCompanyFilter.toUpperCase();
+              else companyToDisplayInHeader = null; // No mostrar logo de compañía si es inventario general
+              
+              const inventarioItems = entriesToProcess.filter(([, data]) => data && data.inventarioQty && parseQuantity(data.inventarioQty) > 0);
+              dataForPdf = sortEntriesByCurrentMode(inventarioItems).map(([name, data]) => [
+                  name, formatQuantity(parseQuantity(data.inventarioQty)), data.unit || 'pz'
+              ]);
+          } else { // Pedido CON FILTRO u Orden (con o sin filtro)
+              pdfTitle = "ORDEN"; // Para Pedido con filtro, el título sigue siendo ORDEN + compañía
+              if (currentCompanyFilter) pdfTitle += " - " + currentCompanyFilter.toUpperCase();
+              else companyToDisplayInHeader = null;
+
+              const orderItems = entriesToProcess.filter(([, data]) => 
+                  data && ((data.pedidoQty && parseQuantity(data.pedidoQty) > 0) || (data.creditQty && parseQuantity(data.creditQty) > 0))
+              );
+              const sortedOrderItems = sortEntriesByCurrentMode(orderItems);
+              sortedOrderItems.forEach(([name, data]) => {
+                  if (data.pedidoQty && parseQuantity(data.pedidoQty) > 0) {
+                      dataForPdf.push([name, formatQuantity(parseQuantity(data.pedidoQty)), data.presentation || 'caja']);
+                  }
+                  if (data.creditQty && parseQuantity(data.creditQty) > 0) {
+                      dataForPdf.push([name + " (CRÉDITO)", formatQuantity(parseQuantity(data.creditQty)), data.creditPresentation || data.presentation || 'caja']);
+                  }
+              });
+          }
+
+          if (dataForPdf.length === 0) {
+              alert("No hay datos para generar el PDF en la vista actual.");
+              return;
+          }
+          console.log(`[PDF GEN PREP] Llamando a createPDFDocument para: "${pdfTitle}", Compañía en cabecera: "${companyToDisplayInHeader || 'N/A'}"`);
+          doc = createPDFDocument(dataForPdf, pdfTitle, companyToDisplayInHeader, pdfColumns, pdfColumnStyles);
+        }
+
+        // Procesar el PDF (descargar o compartir) - común para ambos flujos (agrupado o simple)
+        if (!doc) { // Seguridad por si doc no se creó
+            console.error("[PDF GEN ERROR] El objeto 'doc' no fue creado.");
+            alert("Error crítico al generar PDF: el documento no pudo ser creado.");
+            return;
+        }
+
+        const fileNameToUse = pdfTitle.replace(/ /g, "_") + ".pdf";
+        if (action === 'share') {
+          const pdfBlob = doc.output('blob');
+          const file = new File([pdfBlob], fileNameToUse, { type: "application/pdf" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: pdfTitle, text: "Documento: " + pdfTitle })
+              .catch(err => { console.error("Error al compartir PDF:", err); doc.save(fileNameToUse); });
+          } else { doc.save(fileNameToUse); }
+        } else { // action === 'download'
+          doc.save(fileNameToUse);
+        }
         closeShareModal();
+
       } catch (e) {
-        console.error("Error al generar PDF:", e);
+        console.error("Error principal en generateAndProcessPDF:", e);
         alert("Error al generar el PDF.");
       }
     }
 
-    function createPDFDocument() {
+    function sharePDF() { // Alias
+      generateAndProcessPDF('share');
+    }
+
+    function downloadPDF() { // Alias
+      generateAndProcessPDF('download');
+    }
+
+    function drawCompanyHeaderForGroupedPDF(doc, companyName, startY, pageWidth, margin) {
+      const logoSize = 15;
+      let yPos = startY;
+      let companyLogoSrc = APP_DEFAULT_LOGO;
+      const company = getCompanies().find(c => c.name === companyName);
+
+      if (company && company.image) {
+          companyLogoSrc = company.image;
+      }
+
+      try {
+          doc.addImage(companyLogoSrc, 'PNG', margin, yPos, logoSize, logoSize, undefined, 'FAST');
+      } catch (e) {
+          console.error(`[PDF GROUPED LOGO ERR] Compañía: ${companyName}, Src: ${companyLogoSrc}`, e);
+      }
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(companyName.toUpperCase(), margin + logoSize + 5, yPos + logoSize / 2 + 3);
+      
+      yPos += logoSize + 5; // Espacio después del encabezado de compañía
+      return yPos;
+    }
+
+    function createPDFDocument(dataEntries, documentTitle, companyForHeaderName, columns = ['PRODUCTO', 'CANT.', 'UNIDAD'], columnStyles = { 0: { cellWidth: 'auto' }, 1: { cellWidth: 25, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } }) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       
       // Configuración inicial
       doc.setFont('helvetica', 'normal');
       const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 15; // Reducir margen para más espacio
-      let yPos = margin + 5;
+      const pageHeight = doc.internal.pageSize.getHeight(); // Used for footer
+      const margin = 15;
+      let yPos = margin; // Start yPos at the top margin
 
-      // Título del Documento
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
-      doc.text("ORDER", pageWidth / 2, yPos, { align: 'center' }); // Título cambiado
-      yPos += 10;
+      const logoSize = 20; // Altura y anchura del logo
+      let actualLogoSrc = APP_DEFAULT_LOGO; 
+      let companyDisplayNameForLog = companyForHeaderName || "N/A (General)";
 
-      // Fecha actual
+      console.log(`[PDF LOGO PREP] createPDFDocument received companyForHeaderName: "${companyDisplayNameForLog}"`);
+
+      // Determinar el logo a usar
+      if (companyForHeaderName && companyForHeaderName.trim() !== "") { // Asegurarse que no sea una cadena vacía
+        const company = getCompanies().find(c => c.name === companyForHeaderName);
+        if (company) {
+            console.log(`[PDF LOGO PREP] Found company in settings: "${company.name}". It has image URL: "${company.image || '(no image URL)'}"`);
+            if (company.image) {
+                actualLogoSrc = company.image;
+            }
+        } else {
+            console.log(`[PDF LOGO PREP] Company named "${companyForHeaderName}" was NOT FOUND in settings. Using default logo.`);
+        }
+      } else {
+          console.log(`[PDF LOGO PREP] No specific company provided for header (companyForHeaderName is falsy or empty). Using default logo.`);
+      }
+      console.log(`[PDF LOGO PREP] Final actualLogoSrc for PDF: "${actualLogoSrc}"`);
+
+      // 1. Dibujar Logo (Alineado a la Izquierda)
+      try {
+        // La base del logo estará en yPos
+        // console.log("Intentando agregar logo al PDF. CompanyForHeaderName:", companyForHeaderName, "ActualLogoSrc:", actualLogoSrc); // Depuración anterior
+        doc.addImage(actualLogoSrc, 'PNG', margin, yPos, logoSize, logoSize, undefined, 'FAST');
+      } catch (e) {
+        console.error("[PDF LOGO ERROR] Error adding logo to PDF:", e, "Logo source que falló:", actualLogoSrc); // Depuración mejorada
+        // No hacer nada más si el logo falla, el texto seguirá apareciendo
+      }
+
+      // 2. Fecha (Arriba a la Derecha)
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       const currentDate = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-      doc.text('Fecha: ' + currentDate, pageWidth - margin, yPos, { align: 'right' });
-      yPos += 5; // Espacio después de la fecha
-      
-      // Información de la Compañía (si está filtrada)
-      if (currentCompanyFilter) {
-        const company = getCompanies().find(c => c.name === currentCompanyFilter);
-        if (company) {
-          yPos += 5; // Espacio antes de la info de la compañía
-          const companyNameForPDF = company.name.toUpperCase();
-          if (company.image) {
-            try {
-              const logoWidth = 20;
-              const logoHeight = 20;
-              const companyNameWidth = doc.getTextWidth(companyNameForPDF);
-              const totalHeaderWidth = logoWidth + 5 + companyNameWidth;
-              let logoX = (pageWidth - totalHeaderWidth) / 2;
-              let textX = logoX + logoWidth + 5;
-              
-              doc.addImage(company.image, 'PNG', logoX, yPos - (logoHeight/2) - 2 , logoWidth, logoHeight, undefined, 'FAST');
-              doc.setFontSize(14);
-              doc.setFont('helvetica', 'bold');
-              doc.text(companyNameForPDF, textX, yPos); // Mostrar nombre solo una vez
-          } catch (e) {
-            console.error("Error al cargar logo:", e);
-              doc.setFontSize(14);
-              doc.setFont('helvetica', 'bold');
-              doc.text(companyNameForPDF, pageWidth / 2, yPos, { align: 'center' });
-          }
-        } else {
-            doc.setFontSize(14);
-            doc.setFont('helvetica', 'bold');
-            doc.text(companyNameForPDF, pageWidth / 2, yPos, { align: 'center' });
-          }
-          yPos += 10; // Espacio después de la info de la compañía
-        }
-      }
-      
-      // Línea separadora horizontal (opcional, ya que autoTable tiene sus propias líneas)
-      // doc.setDrawColor(180, 180, 180);
-      // doc.setLineWidth(0.3);
-      // doc.line(margin, yPos, pageWidth - margin, yPos);
-      // yPos += 8;
-      
-      // No dibujar encabezados manualmente, autoTable lo hará.
-      // const tableStartY = yPos;
-      // doc.setFontSize(11);
-      // ... (código de dibujo manual de encabezados eliminado)
-      // yPos = tableStartY + 7;
-      
-      // --- Recopilación de Items y Totales (sin cambios) ---
-      const items = getAllItems();
-      let entries = Object.entries(items).filter(([, data]) => {
-        return data && (
-          (data.pedidoQty && parseQuantity(data.pedidoQty) > 0) || 
-          (data.creditQty && parseQuantity(data.creditQty) > 0)
-        );
-      });
+      const dateText = 'Fecha: ' + currentDate;
+      const dateTextWidth = doc.getTextWidth(dateText);
+      // Posicionar la fecha. Su línea base estará un poco arriba del centro del logo.
+      const yFecha = yPos + (logoSize / 2) - (doc.getLineHeight(dateText) / 2) + 2; // Centrado vertical de la fecha con el logo
+      doc.text(dateText, pageWidth - margin - dateTextWidth, yFecha);
 
-      if (currentCompanyFilter) { // Aplicar filtro de compañía a los items del PDF
-        entries = entries.filter(([, data]) => data && data.company === currentCompanyFilter);
-      }
-      // No aplicamos filtro de búsqueda (searchTerm) al PDF, usualmente se quiere el pedido completo de la compañía.
-
-      entries = sortEntriesByCurrentMode(entries); // Usar el modo de orden actual
-
-      let distinctItemCountForPDF = 0;
-      let totalQuantitySumForPDF = 0;
-      const bodyData = [];
-
-      entries.forEach(([name, data]) => {
-        if (data.pedidoQty && parseQuantity(data.pedidoQty) > 0) {
-          distinctItemCountForPDF++; // Contar solo una vez si tiene pedido y crédito
-          totalQuantitySumForPDF += parseQuantity(data.pedidoQty);
-          bodyData.push([
-            name,
-            formatQuantity(parseQuantity(data.pedidoQty)),
-            data.presentation || 'caja'
-          ]);
-        }
-        if (data.creditQty && parseQuantity(data.creditQty) > 0) {
-          if (!(data.pedidoQty && parseQuantity(data.pedidoQty) > 0)) {
-             // Solo contar como item distinto si no fue contado por pedidoQty
-            distinctItemCountForPDF++; 
-          }
-          totalQuantitySumForPDF += parseQuantity(data.creditQty);
-          bodyData.push([
-            name + " (CRÉDITO)",
-            formatQuantity(parseQuantity(data.creditQty)),
-            data.creditPresentation || data.presentation || 'caja'
-          ]);
-        }
-      });
-      // --- Fin Recopilación ---
+      // 3. Título del Documento (A la derecha del logo)
+      const titleX = margin + logoSize + 5; // 5px de espacio entre logo y título
+      // Centrar el título verticalmente con el logo
+      // Para centrar texto, se usa la mitad de la altura del texto (aproximada por el tamaño de fuente)
+      // La línea base del título estará aproximadamente en el centro del logo.
+      const titleFontSize = 18;
+      doc.setFontSize(titleFontSize);
+      doc.setFont('helvetica', 'bold');
+      const yTitulo = yPos + (logoSize / 2) + (titleFontSize / 2.8); // Ajuste para centrar línea base de texto grande
+      
+      // Ancho máximo para el título, dejando espacio para la fecha y márgenes
+      const titleMaxWidth = pageWidth - titleX - margin - dateTextWidth - 10; // 10px de margen con la fecha
+      
+      doc.text(documentTitle.toUpperCase(), titleX, yTitulo, { maxWidth: titleMaxWidth });
+      
+      // Actualizar yPos para estar debajo del bloque del logo/título (el elemento más alto es el logo)
+      yPos += logoSize + 15; // Aumentado a 15px de espacio después de la cabecera antes de la tabla
 
       doc.autoTable({
-        startY: yPos, // autoTable tomará yPos como el inicio
-        head: [['PRODUCTO', 'CANT.', 'UNIDAD']], // Definir encabezados para autoTable
-        body: bodyData,
+        startY: yPos,
+        head: [columns],
+        body: dataEntries,
         theme: 'grid',
         margin: { left: margin, right: margin },
         styles: { fontSize: 9, cellPadding: 1.5, lineColor: [200,200,200], lineWidth: 0.1 },
         headStyles: { fillColor: [230, 230, 230], textColor: [50,50,50], fontSize: 10, fontStyle: 'bold', cellPadding: 2 },
-        columnStyles: {
-          0: { cellWidth: pageWidth - margin * 2 - 30 - 25 }, // Producto
-          1: { cellWidth: 25, halign: 'center' }, // Cantidad
-          2: { cellWidth: 30, halign: 'center' }  // Unidad
-        },
+        columnStyles: columnStyles,
         didDrawPage: function (data) {
-          // Pie de página
           doc.setFontSize(8);
           doc.setTextColor(150, 150, 150);
           doc.text('Página ' + doc.internal.getNumberOfPages(), pageWidth - margin, pageHeight - 7, { align: 'right' });
           doc.text('Generado el ' + new Date().toLocaleString('es-ES', {dateStyle: 'medium', timeStyle: 'short'}), margin, pageHeight - 7);
         },
-        // Usar yPos de la tabla para el resumen
         didParseCell: function(data) {
-            if (data.section === 'body' && data.row.raw[0].includes("(CRÉDITO)")) {
-                data.cell.styles.textColor = [200, 0, 0]; // Color rojo para créditos
+            if (data.section === 'body' && data.row.raw[0].toString().includes("(CRÉDITO)")) { // Convertir a string por si acaso
+                data.cell.styles.textColor = [200, 0, 0];
                 data.cell.styles.fontStyle = 'italic';
             }
         }
       });
 
-      yPos = doc.lastAutoTable.finalY + 10; // Actualizar yPos después de la tabla
+      yPos = doc.lastAutoTable.finalY + 10; // Espacio después de la tabla
 
-      // Resumen del Pedido
-      doc.setFontSize(10);
-          doc.setFont('helvetica', 'bold');
-      doc.text("RESUMEN DEL PEDIDO:", margin, yPos);
-      yPos += 6;
-          doc.setFont('helvetica', 'normal');
-      doc.text(`Total de Ítems Distintos: ${distinctItemCountForPDF}`, margin + 5, yPos);
-      yPos += 5;
-      doc.text(`Total de Unidades: ${formatQuantity(totalQuantitySumForPDF)}`, margin + 5, yPos);
+      // Antes de dibujar el resumen, verificar si hay espacio o añadir nueva página
+      const estimatedSummaryHeight = 40; // Altura aproximada para 3-4 líneas de resumen + buffer
+      const footerAreaHeight = 15; // Espacio reservado para el footer
 
-      // Restaurar color de texto a negro para el resto del documento (ya no es necesario aquí)
-      // doc.setTextColor(0, 0, 0);
+      if (yPos + estimatedSummaryHeight > pageHeight - footerAreaHeight - margin) {
+        doc.addPage();
+        yPos = margin; // Reiniciar yPos para la nueva página
+      }
+
+      // Resumen solo si es un documento de ORDEN (verificando el título)
+      if (documentTitle.toUpperCase().startsWith("ORDEN")) {
+        let distinctItemCountForPDF = 0;
+        let totalQuantitySumForPDF = 0;
+        dataEntries.forEach(entry => {
+            distinctItemCountForPDF++; // Cada entrada es un ítem distinto en la tabla
+            totalQuantitySumForPDF += parseQuantity(entry[1]); // La cantidad está en la segunda columna
+        });
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text("RESUMEN DEL PEDIDO:", margin, yPos);
+        yPos += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total de Ítems Distintos: ${distinctItemCountForPDF}`, margin + 5, yPos);
+        yPos += 5;
+        doc.text(`Total de Unidades: ${formatQuantity(totalQuantitySumForPDF)}`, margin + 5, yPos);
+      } else if (documentTitle.toUpperCase().startsWith("INVENTARIO")) { // NUEVO: Resumen para Inventario
+        let distinctItemCountForPDF = 0;
+        let totalQuantitySumForPDF = 0;
+        dataEntries.forEach(entry => {
+            distinctItemCountForPDF++; 
+            totalQuantitySumForPDF += parseQuantity(entry[1]);
+        });
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text("RESUMEN DEL INVENTARIO:", margin, yPos);
+        yPos += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total de Ítems Distintos: ${distinctItemCountForPDF}`, margin + 5, yPos);
+        yPos += 5;
+        doc.text(`Total de Unidades en Inventario: ${formatQuantity(totalQuantitySumForPDF)}`, margin + 5, yPos);
+      }
       
       return doc;
     }
@@ -5079,11 +5242,59 @@
       
       // Generar el PDF para adjuntar
       try {
-        const doc = createPDFDocument(); // Reutilizamos la función existente
-        const pdfBlob = doc.output('blob');
-        const companyNameForFile = currentCompanyFilter.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const dateSuffix = new Date().toISOString().split('T')[0];
-        currentOrderPDFFile = new File([pdfBlob], `orden_${companyNameForFile}_${dateSuffix}.pdf`, { type: "application/pdf" });
+        // Preparamos los datos específicamente para la ORDEN de ESTA compañía
+        let orderDataForPdf = [];
+        const allItemsObject = getAllItems();
+        let orderEntries = Object.entries(allItemsObject);
+
+        // Filtrar por la compañía actual del mensaje (importante)
+        orderEntries = orderEntries.filter(([, data]) => data && data.company === currentCompanyFilter);
+        
+        // Filtrar por productos con cantidad de pedido o crédito
+        orderEntries = orderEntries.filter(([, data]) => 
+          data && (
+            (data.pedidoQty && parseQuantity(data.pedidoQty) > 0) || 
+            (data.creditQty && parseQuantity(data.creditQty) > 0)
+          )
+        );
+        orderEntries = sortEntriesByCurrentMode(orderEntries); // Ordenar
+
+        orderEntries.forEach(([name, data]) => {
+          if (data.pedidoQty && parseQuantity(data.pedidoQty) > 0) {
+            orderDataForPdf.push([
+              name,
+              formatQuantity(parseQuantity(data.pedidoQty)),
+              data.presentation || 'caja'
+            ]);
+          }
+          if (data.creditQty && parseQuantity(data.creditQty) > 0) {
+            orderDataForPdf.push([
+              name + " (CRÉDITO)",
+              formatQuantity(parseQuantity(data.creditQty)),
+              data.creditPresentation || data.presentation || 'caja'
+            ]);
+          }
+        });
+
+        if (orderDataForPdf.length === 0) {
+          // No hay items en la orden para esta compañía, no adjuntar PDF
+          currentOrderPDFFile = null;
+        } else {
+          const pdfTitle = "ORDEN - " + currentCompanyFilter.toUpperCase();
+          const pdfColumns = ['PRODUCTO', 'CANT.', 'UNIDAD'];
+          const pageWidth = new jsPDF().internal.pageSize.getWidth();
+          const margin = 15;
+          const pdfColumnStyles = {
+            0: { cellWidth: pageWidth - margin * 2 - 30 - 25 }, 
+            1: { cellWidth: 25, halign: 'center' }, 
+            2: { cellWidth: 30, halign: 'center' }  
+          };
+          const doc = createPDFDocument(orderDataForPdf, pdfTitle, currentCompanyFilter, pdfColumns, pdfColumnStyles);
+          const pdfBlob = doc.output('blob');
+          const companyNameForFile = currentCompanyFilter.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+          const dateSuffix = new Date().toISOString().split('T')[0];
+          currentOrderPDFFile = new File([pdfBlob], `orden_${companyNameForFile}_${dateSuffix}.pdf`, { type: "application/pdf" });
+        }
       } catch (e) {
         console.error("Error al generar PDF para compartir:", e);
         currentOrderPDFFile = null; // Asegurarse de que esté nulo si falla
@@ -5594,6 +5805,32 @@
       }
     });
     // --- FIN NUEVAS FUNCIONES ---
+
+    // --- INICIO NUEVAS FUNCIONES PARA ESTABLECER INVENTARIO A 1 ---
+    function openSetAllInventoryToOneModal() {
+      console.log("openSetAllInventoryToOneModal CALLED"); // <-- Linea de depuración
+      document.getElementById('setAllInventoryToOneModal').classList.add('show');
+      document.body.classList.add('body-modal-open');
+    }
+
+    function confirmSetAllInventoryToOne() {
+      const items = getAllItems();
+      for (const name in items) {
+        if (items.hasOwnProperty(name) && items[name]) { // Asegurar que el producto exista y sea propio del objeto
+          items[name].inventarioQty = 1; // Establecer a 1
+        }
+      }
+      setAllItems(items);
+      renderInventarioTab(); // Solo renderizar la pestaña de inventario
+      updateItemCount(); // Actualizar el contador
+      closeSetAllInventoryToOneModal();
+    }
+
+    function closeSetAllInventoryToOneModal() {
+      document.getElementById('setAllInventoryToOneModal').classList.remove('show');
+      document.body.classList.remove('body-modal-open');
+    }
+    // --- FIN NUEVAS FUNCIONES PARA ESTABLECER INVENTARIO A 1 ---
   </script>
   <script>
   if ("serviceWorker" in navigator) {
